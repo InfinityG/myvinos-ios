@@ -16,7 +16,7 @@
 #define CARDSTART -CARDHEIGHT
 #define CARDEND CARDHEIGHT*0.5
 
-#define URLEMail @"mailto:support@myvinos.club?subject=MyVinos+Wine+Wallet&body=Hi%2C+please+could+you+help+me+with..."
+#define URLEMail @"mailto:support@myvinos.club?subject=MyVinos Wine Wallet&body=Hi Could you please help me with..."
 
 #import "GMEllipticCurveCrypto.h"
 #import <Parse/Parse.h>
@@ -50,8 +50,10 @@ void freeRawData(void *info, const void *data, size_t size);
 
 @synthesize forgotTable,connectionForgot,dataForgot,jsonDataForgot,connectionReset,dataReset,jsonDataReset,goToCollection,menuView,userMenuView,menuCloseBut;
 
+@synthesize membershipView,membershipViewText,membershipToGet,membershipViewTextSummary,membershipButs,membershipToBuyDict,membershipInfoView,connectionMembership,dataMembership,jsonDataMembership;
 
 int amountToBuy = 0;
+int membershipToGetAmount = 0;
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -62,8 +64,9 @@ int amountToBuy = 0;
         userFound = FALSE;
         userJustSignedUp = FALSE;
         //DESIGN User
-        self.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = [UIColor whiteColor];
         vinosButs = [[NSMutableArray alloc] init];
+        membershipButs = [[NSMutableArray alloc] init];
         userButs = [[NSMutableArray alloc] init];
         topUps = [[NSMutableArray alloc] init];
         topUpsToBuy = [[NSMutableArray alloc] init];
@@ -74,56 +77,49 @@ int amountToBuy = 0;
         
         [self addCreditsView];
         
+        [self addMembershipView];
+        
         //ADD SIGN UP VIEW
          [self addMenuView];
         
         [self addSignUpView];
         
        
-        
-        //CHECK FOR USER
-        //![defaults objectForKey:@"Username"]
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if([defaults objectForKey:@"username"] && [defaults objectForKey:@"password"]){
-            //USER EXISTS
-            userFound = false;
-            NSLog(@"USER EXISTS");
-            
-            //SET LOGIN DEFAULTS
-            logInTable.email = [[NSUserDefaults standardUserDefaults] stringForKey:@"username"];
-            forgotTable.email = [[NSUserDefaults standardUserDefaults] stringForKey:@"username"];
-            logInTable.password = [[NSUserDefaults standardUserDefaults] stringForKey:@"password"];
-            
-            //LOGIN
-            [self loginUser];
-            
-            
-        }
-        else{
-            //DO NOTHING ------> FROM TUTORIAL SHOW SIGN UP SCREEN...
-            
-            //animate welcome text
-            [NSTimer scheduledTimerWithTimeInterval:3.5
-                                                                     target:self
-                                                                   selector:@selector(showTutNextText)
-                                                                   userInfo:nil
-                                                                    repeats:YES];
-            
-        }
-        
-        
-        
-        
-        
-        
-        //MESSAGES
-        
-        
-        
+    
         
     }
     return self;
+}
+
+-(void)checkForAutoUserLogIn{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if([defaults objectForKey:@"username"] && [defaults objectForKey:@"password"]){
+        //USER EXISTS
+        userFound = false;
+        NSLog(@"USER EXISTS");
+        
+        //SET LOGIN DEFAULTS
+        logInTable.email = [[NSUserDefaults standardUserDefaults] stringForKey:@"username"];
+        forgotTable.email = [[NSUserDefaults standardUserDefaults] stringForKey:@"username"];
+        logInTable.password = [[NSUserDefaults standardUserDefaults] stringForKey:@"password"];
+        
+        //LOGIN
+        [self loginUser];
+        
+        
+    }
+    else{
+        //DO NOTHING ------> FROM TUTORIAL SHOW SIGN UP SCREEN...
+        
+        //animate welcome text
+        [NSTimer scheduledTimerWithTimeInterval:3.5
+                                         target:self
+                                       selector:@selector(showTutNextText)
+                                       userInfo:nil
+                                        repeats:YES];
+        
+    }
+    
 }
 
 int welcomeTxtCount = 0;
@@ -553,6 +549,15 @@ int welcomeTxtCount = 0;
     [memberView addSubview:infoCreditButton];
     
     
+    //ADD MEMBERSHIP VIEW BUTTON
+    UIButton *membershipViewBut = [UIButton buttonWithType:UIButtonTypeCustom];
+    membershipViewBut.frame = CGRectMake(contactInfoView.bounds.size.width - contactInfoView.bounds.size.width*0.125, contactInfoView.bounds.size.height*0.825 , contactInfoView.bounds.size.width*0.095, contactInfoView.bounds.size.width*0.095);
+    membershipViewBut.tag = 1;
+    [membershipViewBut setBackgroundImage:[UIImage imageNamed:@"vinosBut.png"]  forState:UIControlStateNormal];
+    [membershipViewBut addTarget:self action:@selector(openUserMembership) forControlEvents:UIControlEventTouchUpInside];
+    [memberView addSubview:membershipViewBut];
+    
+    
     
     
     //FLIP CARD OPEN
@@ -680,7 +685,7 @@ int welcomeTxtCount = 0;
     UIButton *userBut4 = [UIButton buttonWithType:UIButtonTypeCustom];
     userBut4.frame = CGRectMake(userMenuView.bounds.size.width*0.1, userMenuView.bounds.size.height*0.7 , userMenuView.bounds.size.width*0.8, userMenuView.bounds.size.height*0.15);
     userBut4.backgroundColor = [UIColor clearColor];
-    [userBut4 setTitle:@"CANCEL" forState:UIControlStateNormal];
+    [userBut4 setTitle:@"BACK" forState:UIControlStateNormal];
     [userBut4 setTitleColor:[UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
     userBut4.font = [UIFont boldSystemFontOfSize:(userBut4.bounds.size.height*0.5)];
     userBut4.tag = 0;
@@ -722,6 +727,226 @@ int welcomeTxtCount = 0;
 
 }
 
+-(void)addMembershipView
+{
+    NSLog(@"BUILD MEMBERSHIP VIEW");
+    
+    //MEMEEBRSHIP TO GET
+    membershipToGet = [[NSString alloc] init];
+    
+    //ADD MEMBERSHIP VIEW
+    membershipView = [[UIView alloc]initWithFrame:CGRectMake(CARDRECT)];
+    membershipView.alpha = 0.0f;
+    membershipView.backgroundColor = [UIColor whiteColor];
+    
+    //ADD TOP LABEL
+    UILabel *topLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, memberView.bounds.size.height*0.1 ,memberView.bounds.size.width, memberView.bounds.size.height*0.08)];
+    topLabel.textAlignment =  NSTextAlignmentCenter;
+    topLabel.backgroundColor = [UIColor clearColor];
+    topLabel.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
+    topLabel.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(topLabel.bounds.size.height*0.8)];
+    topLabel.userInteractionEnabled = FALSE;
+    [topLabel setText:@"SELECT YOUR MEMBERSHIP"];
+    [membershipView addSubview:topLabel];
+    
+    //ADD TOTAL LABEL
+    membershipViewText = [[UILabel alloc] initWithFrame:CGRectMake(membershipView.bounds.size.width*0.0, membershipView.bounds.size.height*0.6 ,membershipView.bounds.size.width, membershipView.bounds.size.height*0.1)];
+    membershipViewText.textAlignment =  NSTextAlignmentCenter;
+    membershipViewText.backgroundColor = [UIColor clearColor];
+    membershipViewText.textColor = [UIColor blackColor];
+    membershipViewText.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(membershipViewText.bounds.size.height*0.8)];
+    membershipViewText.userInteractionEnabled = FALSE;
+    [membershipViewText setText:@"CHANGE YOUR MEMBERSHIP"];
+    [membershipView addSubview:membershipViewText];
+    
+    //ADD SUMMMERY LABEL
+    membershipViewTextSummary = [[UILabel alloc] initWithFrame:CGRectMake(0, membershipView.bounds.size.height*0.7 ,membershipView.bounds.size.width, membershipView.bounds.size.height*0.08)];
+    membershipViewTextSummary.textAlignment =  NSTextAlignmentCenter;
+    membershipViewTextSummary.backgroundColor = [UIColor clearColor];
+    membershipViewTextSummary.textColor = [UIColor blackColor];
+    membershipViewTextSummary.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(membershipViewTextSummary.bounds.size.height*0.8)];
+    membershipViewTextSummary.userInteractionEnabled = FALSE;
+    [membershipViewTextSummary setText:[NSString stringWithFormat:@"(You will be charged in ZAR)"]];
+    [membershipView addSubview:membershipViewTextSummary];
+    
+    
+    //ADD MEMBERSHIP BUTTONS
+    UIButton *selectButton1 = [UIButton buttonWithType:UIButtonTypeCustom];
+    selectButton1.frame = CGRectMake(membershipView.bounds.size.width*0.05, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
+    [[selectButton1 imageView] setContentMode: UIViewContentModeScaleAspectFit];
+    [selectButton1 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    selectButton1.tag = 1;
+    selectButton1.alpha = 0.5f;
+    [selectButton1 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
+    //selectButton1.contentMode = UIViewContentModeScaleAspectFit;
+    [membershipView addSubview:selectButton1];
+    [membershipButs addObject:selectButton1];
+    
+    UIButton *selectButton2 = [UIButton buttonWithType:UIButtonTypeCustom];
+    selectButton2.frame = CGRectMake(membershipView.bounds.size.width*0.275, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
+    [[selectButton2 imageView] setContentMode: UIViewContentModeScaleAspectFit];
+    [selectButton2 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    selectButton2.tag = 2;
+    selectButton2.alpha = 0.5f;
+    [selectButton2 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
+    //selectButton2.contentMode = UIViewContentModeScaleAspectFit;
+    [membershipView addSubview:selectButton2];
+    [membershipButs addObject:selectButton2];
+    
+    UIButton *selectButton3 = [UIButton buttonWithType:UIButtonTypeCustom];
+    selectButton3.frame = CGRectMake(membershipView.bounds.size.width*0.5, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
+    [[selectButton3 imageView] setContentMode: UIViewContentModeScaleAspectFit];
+    [selectButton3 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    selectButton3.tag = 3;
+    selectButton3.alpha = 0.5f;
+    [selectButton3 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
+    //selectButton3.contentMode = UIViewContentModeScaleAspectFit;
+    [membershipView addSubview:selectButton3];
+    [membershipButs addObject:selectButton3];
+    
+    UIButton *selectButton4 = [UIButton buttonWithType:UIButtonTypeCustom];
+    selectButton4.frame = CGRectMake(membershipView.bounds.size.width*0.725, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
+    [[selectButton4 imageView] setContentMode: UIViewContentModeScaleAspectFit];
+    [selectButton4 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    selectButton4.tag = 4;
+    selectButton4.alpha = 0.5f;
+    [selectButton4 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
+    //selectButton4.contentMode = UIViewContentModeScaleAspectFit;
+    [membershipView addSubview:selectButton4];
+    [membershipButs addObject:selectButton4];
+    
+    //INFO BUTTON
+    
+    //CANCEL BUTTON
+    UIButton *buyMemebrshipCancelIcon = [UIButton buttonWithType:UIButtonTypeCustom];
+    buyMemebrshipCancelIcon.frame = CGRectMake(membershipView.bounds.size.width*0.2,membershipView.bounds.size.height*0.8,membershipView.bounds.size.width*0.3,membershipView.bounds.size.height*0.12);
+    buyMemebrshipCancelIcon.backgroundColor = [UIColor clearColor];
+    [buyMemebrshipCancelIcon setTitle:@"BACK" forState:UIControlStateNormal];
+    [buyMemebrshipCancelIcon setTitleColor:[UIColor colorWithRed:110.0f/255.0f green:0.0f/255.0f blue: 30.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
+    buyMemebrshipCancelIcon.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(buyMemebrshipCancelIcon.bounds.size.height*0.6)];
+    [buyMemebrshipCancelIcon addTarget:self action:@selector(cancelMembership) forControlEvents:UIControlEventTouchUpInside];
+    buyMemebrshipCancelIcon.alpha = 1;
+    buyMemebrshipCancelIcon.tag = 0;
+    buyMemebrshipCancelIcon.titleLabel.textAlignment = NSTextAlignmentLeft;
+    [membershipView addSubview:buyMemebrshipCancelIcon];
+    
+    //SIGN UP BUTTON
+    UIButton *signUpBut = [UIButton buttonWithType:UIButtonTypeCustom];
+    signUpBut.frame = CGRectMake(membershipView.bounds.size.width*0.5,membershipView.bounds.size.height*0.8,membershipView.bounds.size.width*0.3,membershipView.bounds.size.height*0.12);
+    signUpBut.backgroundColor = [UIColor clearColor];
+    [signUpBut setTitle:@"CONFIRM" forState:UIControlStateNormal];
+    [signUpBut setTitleColor:[UIColor colorWithRed:110.0f/255.0f green:0.0f/255.0f blue: 30.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
+    signUpBut.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(signUpBut.bounds.size.height*0.6)];
+    [signUpBut addTarget:self action:@selector(confirmMembership:) forControlEvents:UIControlEventTouchUpInside];
+    signUpBut.alpha = 1;
+    signUpBut.tag = 0;
+    [membershipView addSubview:signUpBut];
+    
+    
+    
+    
+    
+    //ADD CREDIT INFO
+    membershipInfoView = [[UIView alloc] initWithFrame:CGRectMake(CARDRECT)];
+    membershipInfoView.backgroundColor = [UIColor whiteColor];
+    membershipInfoView.alpha = 0.0f;
+    membershipInfoView.layer.cornerRadius = 5;
+    [membershipView addSubview:membershipInfoView];
+    
+    //CREDIT TITLE
+    UILabel *creditTopLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, memberView.bounds.size.height*0.1 ,memberView.bounds.size.width, memberView.bounds.size.height*0.08)];
+    creditTopLabel.textAlignment =  NSTextAlignmentCenter;
+    creditTopLabel.backgroundColor = [UIColor clearColor];
+    creditTopLabel.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
+    creditTopLabel.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(topLabel.bounds.size.height*0.8)];
+    creditTopLabel.userInteractionEnabled = FALSE;
+    [creditTopLabel setText:@"ABOUT MEMBERSHIPS"];
+    [membershipInfoView addSubview:creditTopLabel];
+    
+    
+    //CREDIT DESCRIPTION
+    UITextView *creditDes=[[UITextView alloc] initWithFrame:CGRectMake(membershipInfoView.bounds.size.width*0.1, membershipInfoView.bounds.size.height*0.2, membershipInfoView.bounds.size.width*0.8, membershipInfoView.bounds.size.height*0.6)];
+    creditDes.backgroundColor = [UIColor clearColor];
+    creditDes.textAlignment = NSTextAlignmentCenter;
+    creditDes.font = [UIFont fontWithName:@"SFUIDisplay-Light" size:(creditDes.bounds.size.height*0.1)];
+    creditDes.alpha = 1.0f;
+    creditDes.userInteractionEnabled = FALSE;
+    creditDes.text = @"Memberships are for the most private guests\nVINOS membershisfjidn dsfdsf jsdf sf hdf  f\nVINOS gets topped up the next working day, to keep you within liqur regulations";
+    [membershipInfoView addSubview:creditDes];
+    
+    
+    //TERMS LINK
+    UILabel *termsBut = [[UILabel alloc] initWithFrame:CGRectMake(0, memberView.bounds.size.height*0.85 ,memberView.bounds.size.width, memberView.bounds.size.height*0.08)];
+    termsBut.textAlignment =  NSTextAlignmentCenter;
+    termsBut.backgroundColor = [UIColor clearColor];
+    termsBut.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
+    termsBut.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(topLabel.bounds.size.height*0.8)];
+    termsBut.userInteractionEnabled = TRUE;
+    [termsBut setText:@"TERMS AND CONDITIONS"];
+    [membershipInfoView addSubview:termsBut];
+    
+    UITapGestureRecognizer *tapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showTermsAndConditions)];
+    tapped.numberOfTapsRequired = 1;
+    [termsBut addGestureRecognizer:tapped];
+    
+    
+    //ADD HISTORY BUT
+    UIButton *historyMembersBut = [UIButton buttonWithType:UIButtonTypeCustom];
+    historyMembersBut.frame = CGRectMake(membershipView.bounds.size.width*0.025, membershipView.bounds.size.width*0.025 , membershipView.bounds.size.width*0.1, membershipView.bounds.size.width*0.1);
+    historyMembersBut.tag = 1;
+    [historyMembersBut setBackgroundImage:[UIImage imageNamed:@"infoBut.png"]  forState:UIControlStateNormal];
+    [historyMembersBut addTarget:self action:@selector(openCloseMemberInfoView:) forControlEvents:UIControlEventTouchUpInside];
+    [membershipView addSubview:historyMembersBut];
+    
+    [buttonsView addSubview:membershipView];
+    
+    
+}
+
+-(void)updateMembershipView{
+    NSLog(@"UPDATE MEMBERSHIP VIEW");
+    
+    //UPDATE SUMMARY LABEL
+    NSString *sumTxt = [NSString stringWithFormat:@"UPDATE TO %@ MEMBERSHIP",membershipToGet];
+    if ([membershipViewText respondsToSelector:@selector(setAttributedText:)])
+    {
+        // Create the attributes
+        const CGFloat fontSize = 10;
+        NSDictionary *attrs = @{
+                                NSFontAttributeName:[UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(membershipViewText.bounds.size.height*0.8)],
+                                NSForegroundColorAttributeName:[UIColor blackColor]
+                                };
+        NSDictionary *subAttrs = @{
+                                   NSFontAttributeName:[UIFont fontWithName:@"SFUIDisplay-Bold" size:(membershipViewText.bounds.size.height*0.8)]
+                                   };
+        
+        // Range of " 2012/10/14 " is (8,12). Ideally it shouldn't be hardcoded
+        // This example is about attributed strings in one label
+        // not about internationalization, so we keep it simple :)
+        const NSRange range = [sumTxt rangeOfString:[NSString stringWithFormat:@"%@",membershipToGet]];
+        //NSMakeRange(2,4);
+        
+        // Create the attributed string (text + attributes)
+        NSMutableAttributedString *attributedText =
+        [[NSMutableAttributedString alloc] initWithString:sumTxt
+                                               attributes:attrs];
+        [attributedText setAttributes:subAttrs range:range];
+        
+        // Set it in our UILabel and we are done!
+        [membershipViewText setAttributedText:attributedText];
+    } else {
+        // iOS5 and below
+        [membershipViewText setText:sumTxt];
+    }
+    
+    //UPDATE PURCHASE
+    [membershipViewTextSummary setText: [NSString stringWithFormat:@"(You will be charged ZAR %i)",membershipToGetAmount]];
+    
+    //TEMP SET AMOUNT OF CREDITS
+    [myDelegate updateTempVinosAmount:membershipToGetAmount];
+    
+}
+
 
 -(void)addCreditsView{
     
@@ -753,12 +978,6 @@ int welcomeTxtCount = 0;
     topLabel.userInteractionEnabled = FALSE;
     [topLabel setText:@"TAP TO GET VINOS"];
     [buttonsView addSubview:topLabel];
-    
-   
-    
-    
-    
-    
     
     //ADD TOTAL LABEL
     summeryPurchase = [[UILabel alloc] initWithFrame:CGRectMake(buttonsView.bounds.size.width*0.0, buttonsView.bounds.size.height*0.6 ,buttonsView.bounds.size.width, buttonsView.bounds.size.height*0.1)];
@@ -828,7 +1047,7 @@ selectButton4.tag = 4;
     buyCreditsCCbut = [UIButton buttonWithType:UIButtonTypeCustom];
     buyCreditsCCbut.frame = CGRectMake(buttonsView.bounds.size.width*0.2,buttonsView.bounds.size.height*0.8,buttonsView.bounds.size.width*0.3,buttonsView.bounds.size.height*0.12);
     buyCreditsCCbut.backgroundColor = [UIColor clearColor];
-    [buyCreditsCCbut setTitle:@"CANCEL" forState:UIControlStateNormal];
+    [buyCreditsCCbut setTitle:@"BACK" forState:UIControlStateNormal];
     [buyCreditsCCbut setTitleColor:[UIColor colorWithRed:110.0f/255.0f green:0.0f/255.0f blue: 30.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
     buyCreditsCCbut.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(buyCreditsCCbut.bounds.size.height*0.6)];
     [buyCreditsCCbut addTarget:self action:@selector(cancelCredits) forControlEvents:UIControlEventTouchUpInside];
@@ -1207,6 +1426,25 @@ selectButton4.tag = 4;
     [UIView commitAnimations];
 }
 
+-(void)openCloseMemberInfoView:(UIButton*)sender{
+    NSLog(@"OPEN CLOSE MEMBERSHIP INFO");
+    
+    //OPEN OR CLOSE CREDIT HISTORY
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:0.15f];
+    if(sender.tag == 1){
+        membershipInfoView.alpha = 1.0f;
+        sender.tag = 0;
+    }
+    else{
+        membershipInfoView.alpha = 0.0f;
+        sender.tag = 1;
+    }
+    [UIView commitAnimations];
+}
+
 -(void)updateCreditsView{
     NSLog(@"UPDATE CREDITS VIEW");
     
@@ -1250,7 +1488,7 @@ selectButton4.tag = 4;
     
     //UPDATE PURCHASE
     [summeryLabel setText: [NSString stringWithFormat:@"(You will be charged ZAR %i)",amountToBuy*10]];
-    [buyCreditsCCbut setTitle:@"RESET" forState:UIControlStateNormal];
+    [buyCreditsCCbut setTitle:@"START AGAIN" forState:UIControlStateNormal];
     
     //TEMP SET AMOUNT OF CREDITS
     [myDelegate updateTempVinosAmount:amountToBuy];
@@ -1398,11 +1636,7 @@ selectButton4.tag = 4;
     //buyCredits.center = CGPointMake(self.center.x, CARDEND);
     [UIView commitAnimations];
     
-    /*/CHECK IF USER EXISTS
-    if (!userFound) {
-        [self flipOpenCard];
-    }
-    */
+
 }
 
 
@@ -1451,14 +1685,45 @@ selectButton4.tag = 4;
     if (userFound) {
         [self flipOpenCard];
         /*
-        [UIView beginAnimations:NULL context:NULL];
-        [UIView setAnimationDelegate:self];
-        [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
-        [UIView setAnimationDelay:0.35f];
-        [UIView setAnimationDuration:0.15f];
-        buyCredits.alpha = 1.0f;
-        [UIView commitAnimations];
-        */
+         [UIView beginAnimations:NULL context:NULL];
+         [UIView setAnimationDelegate:self];
+         [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+         [UIView setAnimationDelay:0.35f];
+         [UIView setAnimationDuration:0.15f];
+         buyCredits.alpha = 1.0f;
+         [UIView commitAnimations];
+         */
+    }
+    else{
+        //SHOW INFO TO USER
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Members only"
+                                                        message:@"Sign up for FREE to GET VINOS and use them to have your items delivered to you till late."
+                                                       delegate:self
+                                              cancelButtonTitle:@"Thanks"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+    
+    
+    
+}
+
+-(void)openUserMembership{
+    NSLog(@"\nOPEN USER MEMBERSHIP");
+    
+    //open direct view
+    if (userFound) {
+        membershipView.alpha = 1.0f;
+        [self flipOpenCard];
+        /*
+         [UIView beginAnimations:NULL context:NULL];
+         [UIView setAnimationDelegate:self];
+         [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+         [UIView setAnimationDelay:0.35f];
+         [UIView setAnimationDuration:0.15f];
+         buyCredits.alpha = 1.0f;
+         [UIView commitAnimations];
+         */
     }
     else{
         //SHOW INFO TO USER
@@ -1475,14 +1740,14 @@ selectButton4.tag = 4;
 }
 
 -(void)cancelCredits{
-    NSLog(@"\nCANCEL VIEWS ");
+    NSLog(@"\nCANCEL CREDITS ");
     
     
     if(amountToBuy == 0){
         buttonsView.alpha = 1.0f;
         //buyCredits.alpha = 0.0f;
-        [buyCreditsCCbut setTitle:@"CANCEL" forState:UIControlStateNormal];
-
+        //[buyCreditsCCbut setTitle:@"CANCEL" forState:UIControlStateNormal];
+        
         //SHOW
         [self flipCloseCard];
         //[ self.myDelegate performSelector: @selector( openCloseUser ) ];
@@ -1490,14 +1755,31 @@ selectButton4.tag = 4;
     else{
         [topUpsToBuy removeAllObjects];
         amountToBuy = 0;
-        [buyCreditsCCbut setTitle:@"CANCEL" forState:UIControlStateNormal];
-        [summeryLabel setText:[NSString stringWithFormat:@"(You will be charged ZAR 10 for 1 VINOS)"]];
-        [summeryPurchase setText:@"Purchase VINOS"];
+        
         
         [self updateCreditsView];
         
+        [buyCreditsCCbut setTitle:@"BACK" forState:UIControlStateNormal];
+        [summeryLabel setText:[NSString stringWithFormat:@"(You will be charged ZAR 10 for 1 VINOS)"]];
+        [summeryPurchase setText:@"Purchase VINOS"];
+        
     }
+    
+}
 
+-(void)cancelMembership{
+    NSLog(@"\nCANCEL MEMBERSHIP ");
+    
+    buttonsView.alpha = 1.0f;
+    membershipView.alpha = 0.0f;
+     membershipToGet = @"";
+    membershipToGetAmount = 0;
+     [self flipCloseCard];
+    
+    [membershipViewTextSummary setText:[NSString stringWithFormat:@"(You will be charged in ZAR)"]];
+    [membershipViewText setText:@"SELECT MEMBERSHIP TO BUY"];
+    
+    [myDelegate updateTempVinosAmount:membershipToGetAmount];
 }
 
 
@@ -1663,6 +1945,154 @@ selectButton4.tag = 4;
 
 
 
+-(void)promptMembershipSelection{
+    NSLog(@"PROMPT VINOS SELECTION");
+    
+    float delay = CARDANIMATION + CARDDELAY;
+    for(UIButton *memButs in membershipButs) {
+        [UIView beginAnimations:NULL context:NULL];
+        [UIView setAnimationDelegate:self];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+        [UIView setAnimationDuration:0.15f];
+        [UIView setAnimationDelay:delay];
+        memButs.transform = CGAffineTransformMakeScale(0.85, 0.85);
+        [UIView commitAnimations];
+        
+        delay=delay+0.05f;
+    }
+    
+    NSTimer *myTimer = [NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector(promptVinosSelectionEnd) userInfo:nil repeats:NO];
+    
+    //[NSTimer timerWithTimeInterval:delay target:self selector:@selector(promptSelection:) userInfo:NULL repeats:NO];
+    
+}
+
+-(void)promptMembershipSelectionEnd{
+    
+    
+    float delay = 0.0f;
+    for(UIButton *memButs in membershipButs) {
+        [UIView beginAnimations:NULL context:NULL];
+        [UIView setAnimationDelegate:self];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+        [UIView setAnimationDuration:0.15f];
+        [UIView setAnimationDelay:delay];
+        memButs.transform = CGAffineTransformMakeScale(1, 1);
+        [UIView commitAnimations];
+        
+        delay=delay+0.05f;
+        
+        NSLog(@"PROMPT MEMBERSHIP BUTS SELECTION DOEN");
+    }
+    
+    
+    
+}
+
+
+
+-(void)butMembershipSelected:(UIButton *) sender{
+    NSLog(@"\nSELECT MEMBERSHIP LEVEL %i",sender.tag);
+    
+    //UNSELECT ALL BUTTONS EXCEPT SELECTED ONE
+     [UIView beginAnimations:NULL context:NULL];
+     [UIView setAnimationDelegate:self];
+     [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+     [UIView setAnimationDuration:0.15f];
+     for(UIButton *but in [membershipButs reverseObjectEnumerator]) {
+     if(but.tag == sender.tag) but.alpha = 1.0f;
+     else but.alpha = 0.2f;
+     }
+     [UIView commitAnimations];
+    
+    
+    //FADE BUTTON
+    sender.alpha = 0.7f;
+    [UIView animateWithDuration:0.25 animations:^{sender.alpha = 1.0f;}];
+    
+    
+    //SET MEMEBRSHIP LEVEL
+    switch (sender.tag) {
+        case 1:
+        {
+            //FREE
+            NSLog(@"\nGET FREE MEMBERSHIP ");
+            membershipToGetAmount = 0;
+             membershipToGet = @"FREE";
+            
+            
+            //CREATE
+            membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                              @"72684", @"product_id",
+                                              @"1", @"quantity",
+                                              nil];
+            
+            
+            break;
+        }
+            
+        case 2:
+        {
+            //SILVER
+            NSLog(@"\nGET SILVER MEMBERSHIP ");
+            membershipToGetAmount = 100;
+            membershipToGet = @"SILVER";
+            
+            //CREATE
+            membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                              @"72685", @"product_id",
+                                              @"1", @"quantity",
+                                              nil];
+            
+            
+            break;
+        }
+        case 3:
+        {
+            //GOLD
+            NSLog(@"\nGET GOLD MEMBERSHIP ");
+            membershipToGetAmount = 250;
+            membershipToGet = @"GOLD";
+            
+            //CREATE
+           membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                              @"72340", @"product_id",
+                                              @"1", @"quantity",
+                                              nil];
+            
+            
+            
+            break;
+        }
+        case 4:
+        {
+            //PLATINUM
+            NSLog(@"\nGET PLATINUM MEMBERSHIP ");
+            membershipToGetAmount = 500;
+            membershipToGet = @"PLATINUM";
+            
+            //CREATE
+            membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                              @"72340", @"product_id",
+                                              @"1", @"quantity",
+                                              nil];
+            
+            
+            break;
+        }
+        default:
+            break;
+    }
+    
+    //PRINT RESULT
+    NSLog(@"\n\n MEMEBRSHIP TO BUY UPDATED %@ \n\n",membershipToBuyDict);
+    
+    //UPDATE PURCHASE CARD
+    [self updateMembershipView];
+    
+}
+
+
 -(void)butSelected:(UIButton *) sender{
     NSLog(@"\nSELECT VINOS %i",sender.tag);
     
@@ -1800,14 +2230,67 @@ selectButton4.tag = 4;
 
 }
 
+
+-(void)confirmMembership:(UIButton *) sender{
+    NSLog(@"\nCONFIRM MEMBERSHIP");
+    
+        //SHOW LOADING
+        [myDelegate startLoadingNow:@"Changing Membership"];
+        
+        
+        //CALL API AND CHECK FOR USER UPDATE AFTER CONFIRM MESSAGE
+        dataMembership = [[NSMutableData alloc] init];
+        
+        //NSURL *url = [NSURL URLWithString:@"https://myvinos-api.infinity-g.com/orders"];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",MYVINOSSERVER,@"/orders"]];
+        
+        
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url
+                                                               cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                                                           timeoutInterval:1820.0];
+        
+        NSArray *myTempArrP = [[NSArray alloc] initWithObjects:membershipToBuyDict, nil];
+        
+        //CREATE PRODUCTS ARRAY
+        NSDictionary *requestData = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                     @"mem_purchase", @"type",
+                                     myTempArrP, @"products",
+                                     nil];
+        
+        
+        
+        NSLog(@"\n\nSENDING MEMBERSHIP REQUEST \n %@",requestData);
+        
+        NSString* aStr;
+        NSError *error;
+        
+        NSData *postData = [NSJSONSerialization dataWithJSONObject:requestData options:NSJSONReadingMutableLeaves error:&error];
+        aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
+        
+        
+        NSLog(@"MEMBERSHIP DATA %@",aStr);
+        
+        [request setHTTPMethod:@"POST"];
+        [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+        [request setValue:@"application/x-www-form-urlencode" forHTTPHeaderField:@"Content-Type"];
+        [request setValue:[[NSUserDefaults standardUserDefaults] stringForKey:@"token"] forHTTPHeaderField:@"Authorization"];
+        [request setValue:[NSString stringWithFormat:@"%d", [postData length]] forHTTPHeaderField:@"Content-Length"];
+        [request setHTTPBody:[aStr dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        connectionMembership = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
+    
+}
+
+
 -(void)confirmVinos:(UIButton *) sender{
     NSLog(@"\nCONFIRM VINOS");
     
     if([topUpsToBuy count]>0){
         //SHOW LOADING
-        [myDelegate startLoadingNow];
+        [myDelegate startLoadingNow:@"Processing VINOS"];
         
-        [buyCreditsCCbut setTitle:@"CANCEL" forState:UIControlStateNormal];
+        [buyCreditsCCbut setTitle:@"BACK" forState:UIControlStateNormal];
         
         
         //CALL API AND CHECK FOR USER UPDATE AFTER CONFIRM MESSAGE
@@ -1815,7 +2298,7 @@ selectButton4.tag = 4;
         
         //NSURL *url = [NSURL URLWithString:@"https://myvinos-api.infinity-g.com/orders"];
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",MYVINOSSERVER,@"/orders"]];
-
+        
         
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url
                                                                cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
@@ -1838,7 +2321,7 @@ selectButton4.tag = 4;
         NSError *error;
         
         NSData *postData = [NSJSONSerialization dataWithJSONObject:requestData options:NSJSONReadingMutableLeaves error:&error];
-        aStr = [[NSString alloc] initWithData:postData encoding:NSASCIIStringEncoding];
+        aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
         
         
         NSLog(@"NONNONONONONONONON %@",aStr);
@@ -1851,6 +2334,14 @@ selectButton4.tag = 4;
         [request setHTTPBody:[aStr dataUsingEncoding:NSUTF8StringEncoding]];
         
         connectionTopUp = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+        
+        
+        //STORE TO PARSE VINOS REQUEST
+        PFObject *testObject = [PFObject objectWithClassName:@"VINOS_TOPUP"];
+        testObject[@"products"] = topUpsToBuy;
+        testObject[@"price"] = [NSString stringWithFormat:@"%i",amountToBuy] ;
+        testObject[@"username"] = [[NSUserDefaults standardUserDefaults] stringForKey:@"email"];
+        [testObject saveInBackground];
     }
     else{
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Select VINOS"
@@ -1864,6 +2355,7 @@ selectButton4.tag = 4;
     
     
 }
+
 
 -(void)addTopUp:(NSDictionary*)foundTopUp{
    // NSLog(@"TOP UP ADDED %@",foundTopUp);
@@ -1901,7 +2393,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
 -(void)signUpUser{
     
     //LOADING IMAGE
-    [(ParseStarterProjectViewController*)myDelegate startLoadingNow];
+    [(ParseStarterProjectViewController*)myDelegate startLoadingNow:@"Signing Up"];
     
     signUpTable.view.alpha = 0;
     
@@ -1965,7 +2457,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     
     if([logInTable.password length] > 0 && [logInTable.email length] > 0){
         //LOADING IMAGE
-        [(ParseStarterProjectViewController*)myDelegate startLoadingNow];
+        [(ParseStarterProjectViewController*)myDelegate startLoadingNow:@"Loggin In"];
         
        
         
@@ -1997,7 +2489,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
         NSError *error;
         
         NSData *postData = [NSJSONSerialization dataWithJSONObject:requestData options:NSJSONReadingMutableLeaves error:&error];
-        aStr = [[NSString alloc] initWithData:postData encoding:NSASCIIStringEncoding];
+        aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
         
         NSLog(@"NONNONONONONONONON %@",aStr);
         
@@ -2041,7 +2533,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     NSError *error;
     
     NSData *postData = [NSJSONSerialization dataWithJSONObject:jsonDataLogIn options:NSJSONReadingMutableLeaves error:&error];
-    aStr = [[NSString alloc] initWithData:postData encoding:NSASCIIStringEncoding];
+    aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
     
     NSLog(@"NONNONONONONONONON %@",aStr);
     
@@ -2057,18 +2549,15 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
 -(void)getUser{
    
     //LOADING IMAGE
-    [(ParseStarterProjectViewController*)myDelegate startLoadingNow];
+    [(ParseStarterProjectViewController*)myDelegate startLoadingNow:@"Refreshing"];
     
     //REMOVE SIGN UP VIEW
     signUpView.alpha = 0.0f;
-    //[signUpTable.view removeFromSuperview];
     [signUpView removeFromSuperview];
     userFound = TRUE;
     
     //GET DATA
     dataUser = [[NSMutableData alloc] init];
-    //NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@",MYVINOSSERVER,@"/users/",[[NSUserDefaults standardUserDefaults] stringForKey:@"username"]]];
-    //NSString* urlString = [NSString stringWithFormat:@"https://myvinos-api.infinity-g.com/users/%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"username"]] ;
     NSString* urlString = [NSString stringWithFormat:@"%@%@%@",MYVINOSSERVER,@"/users/",[[NSUserDefaults standardUserDefaults] stringForKey:@"username"]] ;
     NSLog(@"GET USER %@ ----",urlString);
     
@@ -2111,7 +2600,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     NSLog(@"SEND OTP");
     
     //LOADING IMAGE
-    [(ParseStarterProjectViewController*)myDelegate startLoadingNow];
+    [(ParseStarterProjectViewController*)myDelegate startLoadingNow:@"Sending SMS"];
     
         //GET DATA
     dataForgot = [[NSMutableData alloc] init];
@@ -2136,7 +2625,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     NSError *error;
     
     NSData *postData = [NSJSONSerialization dataWithJSONObject:requestData options:NSJSONReadingMutableLeaves error:&error];
-    aStr = [[NSString alloc] initWithData:postData encoding:NSASCIIStringEncoding];
+    aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
     
     NSLog(@"NONNONONONONONONON %@",aStr);
     
@@ -2179,7 +2668,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     NSError *error;
     
     NSData *postData = [NSJSONSerialization dataWithJSONObject:requestData options:NSJSONReadingMutableLeaves error:&error];
-    aStr = [[NSString alloc] initWithData:postData encoding:NSASCIIStringEncoding];
+    aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
     
     NSLog(@"NONNONONONONONONON %@",aStr);
     
@@ -2223,6 +2712,8 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
         [self.dataForgot appendData:data];
     }else if(connection == self.connectionReset) {
         [self.dataReset appendData:data];
+    }else if(connection == self.connectionMembership) {
+        [self.dataMembership appendData:data];
     }
     // Append the new data to receivedData.
     // receivedData is an instance variable declared elsewhere.
@@ -2235,7 +2726,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     //LOADING IMAGE
     [(ParseStarterProjectViewController*)myDelegate stopLoading];
     
-    /*/ALERT VIEW PROMPT
+    //ALERT VIEW PROMPT
     //SHOW INFO TO USER
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Something went wrong."
                                                     message:@"Check your connection settings or try again. If the problem persits try closing the app properly and starting again."
@@ -2244,7 +2735,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
                                           otherButtonTitles:nil];
     alert.tag = 69;
     [alert show];
-     */
+    
     
     
 }
@@ -2560,12 +3051,12 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
             myPaymentPage = [[UIWebView alloc] initWithFrame:self.bounds];
             myPaymentPage.delegate = self;
             myPaymentPage.backgroundColor = [UIColor whiteColor];
-            //NSString *myHTML = [NSString stringWithFormat:@"<html><head><script src=\"https://code.jquery.com/jquery.js\" type=\"text/javascript\"></script><script type=\"text/javascript\">var wpwlOptions = {onReady: function(){var createRegistrationHtml = '<div class=\"customLabel\">Store card?</div><div class=\"customInput\"><input type=\"checkbox\" name=\"createRegistration\" value=\"true\" /></div>';$('form.wpwl-form-card').find('.wpwl-button').before(createRegistrationHtml); }}</script><script async src=\"%@%@\" type=\"text/javascript\"></script></head><body><form action=\"http://www.google.com\" class=\"paymentWidgets\">VISA MASTER AMEX</form></body></html>",[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_uri"],[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_id"]];
+            //NSString *myHTML = [NSString stringWithFormat:@"<html><head><script src=\"https://code.jquery.com/jquery.js\" type=\"text/javascript\"></script><script type=\"text/javascript\">var wpwlOptions = {onReady: function(){var createRegistrationHtml = '<div class=\"customLabel\">Store card?</div><div class=\"customInput\"><input type=\"checkbox\" name=\"createRegistration\" value=\"true\" /></div>';$('form.wpwl-form-card').find('.wpwl-button').before(createRegistrationHtml); }}</script><script async src=\"%@%@\" type=\"text/javascript\"></script></head><body><form action=\"http://www.myvinos.club\" class=\"paymentWidgets\">VISA MASTER AMEX</form></body></html>",[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_uri"],[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_id"]];
             
             
             
             
-            NSString *myHTML = [NSString stringWithFormat:@"<html><head><script src=\"%@%@\"></script><style>html,body  {background-color:white;}.wpwl-container  {background-color:white;color: black;}.wpwl-form { color: black;background-color:white;font-family: Helvetica, Arial, sans-serif !important;}</style></head><body><form action=\"http://www.google.com\" class=\"paymentWidgets\">VISA MASTER AMEX</form></body></html>",[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_uri"],[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_id"]];
+            NSString *myHTML = [NSString stringWithFormat:@"<html><head><script src=\"%@%@\"></script><style>html,body  {background-color:white;}.wpwl-container  {background-color:white;color: black;}.wpwl-form { color: black;background-color:white;font-family: Helvetica, Arial, sans-serif !important;}</style></head><body><form action=\"http://www.myvinos.club\" class=\"paymentWidgets\">VISA MASTER AMEX</form></body></html>",[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_uri"],[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_id"]];
             
            
             
@@ -2782,6 +3273,82 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
             
             
         }
+    }else if(connection == self.connectionMembership) {
+        //GET STRING FROM DATA RETURNED
+        NSString *responseString = [[NSString alloc] initWithData:dataMembership encoding:NSUTF8StringEncoding];
+        NSLog(@"MEMBERSHIP data done %@",responseString);
+        NSError *e = nil;
+        
+        //BUILD JSON DATA
+        NSData *jsonData = [responseString dataUsingEncoding:NSUTF8StringEncoding];
+        //CREATE DICTIONARY
+        jsonDataMembership = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error: &e];
+        NSLog(@"MEMEBRSHIP DATA DONE:\n %@",jsonDataMembership);
+        //CHECK IF ERROR EXISTS AS KEY
+        if ([jsonDataMembership objectForKey:@"errors"]) {
+            //NOT SUCESS
+            NSLog(@"ERROR %@",[[jsonDataMembership objectForKey:@"errors"] objectAtIndex:0]);
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Try again"
+                                                            message:[[jsonDataMembership objectForKey:@"errors"] componentsJoinedByString:@"\n"]
+                                                           delegate:self
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+            
+            //LOADING IMAGE
+            [(ParseStarterProjectViewController*)myDelegate stopLoading];
+            
+        }
+        if ([[jsonDataMembership objectForKey:@"checkout_uri"] isKindOfClass:[NSNull class]]) {
+            //MEMBERSHIP WORKED AND USER SELECTED FREE SO NO PAYMENT TO SHOW
+            NSLog(@"MEMBERSHIP WORKED NO PAYMENT NEEDED");
+            
+            /*
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"DONE"
+                                                            message:[jsonDataMembership objectForKey:@"memo"]
+                                                           delegate:self
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+            */
+            
+            //LOADING IMAGE
+            [(ParseStarterProjectViewController*)myDelegate stopLoading];
+        }
+        else{
+            //WORKED
+            NSLog(@"MEMEBERSHIP WORKED %@",jsonDataMembership);
+            
+            //GET CHECKOUT ID
+            [[NSUserDefaults standardUserDefaults] setObject:[jsonDataMembership objectForKey:@"checkout_id"] forKey:@"checkout_id"];
+            [[NSUserDefaults standardUserDefaults] setObject:[jsonDataMembership objectForKey:@"checkout_uri"] forKey:@"checkout_uri"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            //CREATE WEB VIEW WITH CHECKOUT ID
+            myPaymentPage = [[UIWebView alloc] initWithFrame:self.bounds];
+            myPaymentPage.delegate = self;
+            myPaymentPage.backgroundColor = [UIColor whiteColor];
+            
+            NSString *myHTML = [NSString stringWithFormat:@"<html><head><script src=\"%@%@\"></script><style>html,body  {background-color:white;}.wpwl-container  {background-color:white;color: black;}.wpwl-form { color: black;background-color:white;font-family: Helvetica, Arial, sans-serif !important;}</style></head><body><form action=\"http://www.myvinos.club\" class=\"paymentWidgets\">VISA MASTER AMEX</form></body></html>",[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_uri"],[[NSUserDefaults standardUserDefaults] stringForKey:@"checkout_id"]];
+            
+            
+            
+            [myPaymentPage loadHTMLString:myHTML baseURL:nil];
+            
+            [self addSubview:myPaymentPage];
+            
+            [self cancelMembership];
+            
+            //START FAIL TIMER
+            //UPDATE USER DETAILS - 30secs
+            paymentTimeLimitTimer = [NSTimer scheduledTimerWithTimeInterval:3000.0
+                                                                     target:self
+                                                                   selector:@selector(paymentTimeExpired)
+                                                                   userInfo:nil
+                                                                    repeats:NO];
+            
+        }
     }
     
    
@@ -2813,7 +3380,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType{
     NSLog(@"SHOULD START LOADING %@",request.URL.host);
     
-    if([request.URL.host isEqualToString:@"www.google.com"]){
+    if([request.URL.host isEqualToString:@"www.myvinos.club"]){
         NSLog(@"PAYMENT PENDING");
         //STOP TIMER
         [paymentTimeLimitTimer invalidate];
@@ -2824,10 +3391,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         myPaymentPage = nil;
         
         //SHOW LOADING SCREEN
-        [myDelegate startLoadingNow];
+        [myDelegate startLoadingNow:@"Processing Payment"];
         
         //UPDATE USER DETAILS - 30secs
-        [NSTimer scheduledTimerWithTimeInterval:30.0
+        [NSTimer scheduledTimerWithTimeInterval:45.0
                                          target:self
                                        selector:@selector(getUser)
                                        userInfo:nil

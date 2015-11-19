@@ -26,7 +26,7 @@
 - (void)openCloseUser;
 -(id)getDeliveryData;
 
--(void)startLoadingNow;
+-(void)startLoadingNow:(NSString*)lStatus;
 -(void)stopLoading;
 
 -(NSString*)getDeliveryAddress;

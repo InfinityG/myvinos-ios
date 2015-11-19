@@ -191,7 +191,7 @@
     myAnnotation.coordinate = CLLocationCoordinate2DMake(-33.9245683,18.419775);
     myAnnotation.title = @"Reserve Wine Cellar";
     myAnnotation.subtitle = @"Tap for more information";
-    //[self.mapView addAnnotation:myAnnotation];
+    [self.mapView addAnnotation:myAnnotation];
     
     UILabel *memberTit = [[UILabel alloc] initWithFrame:CGRectMake(mapView.bounds.size.width*0.0, mapView.bounds.size.height*0.0 ,mapView.bounds.size.width*1, mapView.bounds.size.height*0.08)];
     memberTit.textAlignment =  NSTextAlignmentCenter;
@@ -345,7 +345,7 @@
     
     
     //LOADING
-    [myDelegate startLoadingNow];
+    [myDelegate startLoadingNow:@"Placing Delivery"];
     
     
     //CALL API AND CHECK FOR USER UPDATE AFTER CONFIRM MESSAGE
@@ -382,7 +382,7 @@
     NSError *error;
     
     NSData *postData = [NSJSONSerialization dataWithJSONObject:requestData options:NSJSONReadingMutableLeaves error:&error];
-    aStr = [[NSString alloc] initWithData:postData encoding:NSASCIIStringEncoding];
+    aStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
     
     
     NSLog(@"NONNONONONONONONON %@",aStr);
@@ -411,11 +411,6 @@
 
 -(void)addDeliverForm{
     NSLog(@"\nADD DELIVERY FORM");
-    
-    
-  
-    
-   
     
     //DELIVER TIME
     timeLabel =  [[UILabel alloc] initWithFrame:CGRectMake(cardView.bounds.size.width*0.0, cardView.bounds.size.height*0.4 , cardView.bounds.size.width*0.2,cardView.bounds.size.width*0.2 )];
@@ -469,25 +464,39 @@
 #pragma mark -
 #pragma mark MAP DELEGATES
 
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated{
+    NSLog(@"MAP ABOUT TO BE MOVED");
+}
 
 - (void)mapView:(MKMapView *)amapView regionDidChangeAnimated:(BOOL)animated{
-    NSLog(@"MAP MOVED");
+    NSLog(@"MAP MOVED DONE");
     //UPDATE ANNOTATION
    // myAnnotation.coordinate = mapView.camera.centerCoordinate;
     //GEO CODE POSITION
     //[addressLocation setText:@"52 Buitenkant Street, Cape Town"];
     //[mapView setCenterCoordinate:mapView.camera.centerCoordinate animated:YES];
     
-    
-   
-    
-    
-    //GET ADDRESS
+    //GET STRING ADDRESS FROM MOVED MAP
     CLLocation *mapCenterLoc = [[CLLocation alloc] initWithLatitude:mapView.camera.centerCoordinate.latitude longitude:mapView.camera.centerCoordinate.longitude];
     [self reverseGeocode:mapCenterLoc];
     
+   
+    
 }
 
+- (void)mapViewWillStartLocatingUser:(MKMapView *)mapView{
+    NSLog(@"\nSTART LOCATING USER");
+    
+    //WAIT FOR GPS TO BECOME ACCURATE AND UPDATE MAP TO CURRENT LOCATION
+}
+
+- (void)mapViewDidStopLocatingUser:(MKMapView *)mapView{
+    NSLog(@"\nSTOP LOCATING USER");
+}
+
+- (void)mapView:(MKMapView *)mapView didFailToLocateUserWithError:(NSError *)error{
+    NSLog(@"\nFAIL LOCATION %@",error.localizedDescription );
+}
 
 - (void)mapView:(MKMapView *)aMapView didUpdateUserLocation:(MKUserLocation *)aUserLocation {
     NSLog(@"\nUPDATE USER LOCATION");
@@ -503,12 +512,10 @@
     region.span = span;
     region.center = location;
     //[aMapView setRegion:region animated:YES];
-    
      */
     
     //CENTER MAP ON CURRENT LOCATION
     // [mapView setCenterCoordinate:mapView.userLocation.location.coordinate animated:YES];
-    
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
@@ -529,15 +536,30 @@
             pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"CustomPinAnnotationView"];
             //pinView.animatesDrop = YES;
             pinView.canShowCallout = YES;
-            pinView.image = [UIImage imageNamed:@"MyVinosMapMark.png"];
-            pinView.calloutOffset = CGPointMake(16, 25);
+            
+            UIImage *orangeImage = [UIImage imageNamed:@"MyVinosMapMark.png"];
+            CGRect resizeRect;
+            //rescale image based on zoom level
+            resizeRect.size.height = orangeImage.size.height * 0.5;
+            resizeRect.size.width = orangeImage.size.width  * 0.5 ;
+            NSLog(@"height =  %f, width = %f, zoomLevel = %f", resizeRect.size.height, resizeRect.size.width,11 );
+            resizeRect.origin = (CGPoint){0,0};
+            UIGraphicsBeginImageContext(resizeRect.size);
+            [orangeImage drawInRect:resizeRect];
+            UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            pinView.image = resizedImage;
+            
+           // pinView.image = [UIImage imageNamed:@"MyVinosMapMark.png"];
+            
+            pinView.calloutOffset = CGPointMake(16*0.5, 25*0.5);
             
             // Add a detail disclosure button to the callout.
             UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
             pinView.rightCalloutAccessoryView = rightButton;
             
             // Add an image to the left callout.
-            UIImageView *iconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"deliverLocation.png"]];
+            UIImageView *iconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"MyVinosMapMark.png"]];
             pinView.leftCalloutAccessoryView = iconView;
         } else {
             pinView.annotation = annotation;
@@ -551,13 +573,72 @@
     id <MKAnnotation> annotation = [view annotation];
     if ([annotation isKindOfClass:[MKPointAnnotation class]])
     {
-        NSLog(@"Clicked Pizza Shop");
+        NSLog(@"Clicked Shop");
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Reserve Wine Cellar" message:@"Would you like to call us directly for more information?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Call now", nil];
         alertView.tag = 99;
         [alertView show];
     }
     
 }
+
+
+
+
+#pragma mark -
+#pragma mark MAP DIRECTIONS
+
+-(void)showDirectionsOnMap{
+    
+    //REMOVE PREVIOUS OVERLAYS
+    [mapView removeOverlays:mapView.overlays];
+    
+    //DELIVERY LCOATION
+    MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:deliveryLocation.coordinate addressDictionary:nil];
+    MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark] ;
+    [mapItem setName:@"YOU ARE HERE"];
+    
+    //BASE
+    CLLocation *baseLocation = [[CLLocation alloc] initWithLatitude:-33.9245683 longitude:18.419775];
+    MKPlacemark *placemarkBASE = [[MKPlacemark alloc] initWithCoordinate:baseLocation.coordinate addressDictionary:nil];
+    MKMapItem *mapItemBASE = [[MKMapItem alloc] initWithPlacemark:placemarkBASE] ;
+    [mapItemBASE setName:@"MyVinos Wine Cellar"];
+    
+    
+    MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
+    [request setSource:mapItem];
+    [request setDestination:mapItemBASE];
+    [request setTransportType:MKDirectionsTransportTypeAutomobile]; // This can be limited to automobile and walking directions.
+    [request setRequestsAlternateRoutes:NO]; // Gives you several route options.
+    MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
+    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *error) {
+        if (!error) {
+            for (MKRoute *route in [response routes]) {
+                [mapView addOverlay:[route polyline] level:MKOverlayLevelAboveRoads]; // Draws the route above roads, but below labels.
+                // You can also get turn-by-turn steps, distance, advisory notices, ETA, etc by accessing various route properties.
+            }
+        }
+        else{
+            NSLog(@"WE COULD NOT DETERMINE THE BEST ROUTE FOR YOU");
+        }
+    }];
+    
+}
+
+
+
+- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay
+{
+    if ([overlay isKindOfClass:[MKPolyline class]]) {
+        MKPolylineRenderer *renderer = [[MKPolylineRenderer alloc] initWithOverlay:overlay];
+        [renderer setStrokeColor:[UIColor blueColor]];
+        [renderer setLineWidth:5.0];
+        [renderer setAlpha:0.5];
+        return renderer;
+    }
+    return nil;
+}
+
+
 
 
 #pragma mark -
@@ -765,6 +846,8 @@
                          //SET DELIVERY LOCATION
                          deliveryLocation = topResult.location;
                          
+                         //SHOW ROUTE
+                         //[self showDirectionsOnMap];
                          
                          // Create a MLPlacemark and add it to the map view
                          //MKPlacemark *placemark = [[MKPlacemark alloc] initWithPlacemark:topResult];
@@ -805,6 +888,11 @@
             //SET DELIVERY LOCATION
             deliveryLocation = location;
             addressLocation.text = addressString;
+            
+            //SHOW ROUTE
+            [self showDirectionsOnMap];
+            
+            
         } else
             NSLog(@"Error %@", error.description);
     }];
@@ -817,7 +905,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    //NSLog(@"LOCATION in update to location");
+    NSLog(@"LOCATION in update to location");
     
     
     

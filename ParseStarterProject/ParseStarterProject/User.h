@@ -37,6 +37,7 @@
     NSURLConnection *connectionHistory;
     NSURLConnection *connectionForgot;
     NSURLConnection *connectionReset;
+    NSURLConnection *connectionMembership;
     
     NSMutableData *dataSignUp;
     NSMutableData *dataLogIn;
@@ -46,6 +47,7 @@
     NSMutableData *dataHistory;
     NSMutableData *dataForgot;
     NSMutableData *dataReset;
+    NSMutableData *dataMembership;
     
     NSMutableDictionary *jsonDataSignUp;
     NSMutableDictionary *jsonDataLogIn;
@@ -55,6 +57,7 @@
     NSMutableDictionary *jsonDataHistory;
     NSMutableDictionary *jsonDataForgot;
     NSMutableDictionary *jsonDataReset;
+    NSMutableDictionary *jsonDataMembership;
     
     UIWebView *myPaymentPage;
     
@@ -105,6 +108,14 @@
     
     UIButton *menuCloseBut;
     
+    UIView *membershipView;
+    UILabel *membershipViewText;
+    NSString *membershipToGet;
+    UILabel *membershipViewTextSummary;
+    NSMutableArray *membershipButs;
+    NSMutableDictionary *membershipToBuyDict;
+     UIView *membershipInfoView;
+    
 }
 @property (retain, nonatomic) FormTableController *signUpTable;
 @property (retain, nonatomic) FormTableControllerLogIn *logInTable;
@@ -123,6 +134,7 @@
 @property (retain, nonatomic) NSURLConnection *connectionHistory;
 @property (retain, nonatomic) NSURLConnection *connectionForgot;
 @property (retain, nonatomic) NSURLConnection *connectionReset;
+@property (retain, nonatomic) NSURLConnection *connectionMembership;
 
 @property (strong, nonatomic) NSMutableData *dataSignUp;
 @property (strong, nonatomic) NSMutableData *dataLogIn;
@@ -132,6 +144,7 @@
 @property (strong, nonatomic) NSMutableData *dataHistory;
 @property (strong, nonatomic) NSMutableData *dataForgot;
 @property (strong, nonatomic) NSMutableData *dataReset;
+@property (strong, nonatomic) NSMutableData *dataMembership;
 
 
 @property (retain, nonatomic) NSMutableData *collectionData;
@@ -143,6 +156,7 @@
 @property (retain, nonatomic) NSMutableDictionary *jsonDataHistory;
 @property (retain, nonatomic) NSMutableDictionary *jsonDataForgot;
 @property (retain, nonatomic) NSMutableDictionary *jsonDataReset;
+@property (retain, nonatomic) NSMutableDictionary *jsonDataMembership;
 
 @property (retain, nonatomic) UIWebView *myPaymentPage;
 
@@ -191,6 +205,14 @@
 
 @property (strong, nonatomic) UIButton *menuCloseBut;
 
+@property (strong, nonatomic) UIView *membershipView;
+@property (strong, nonatomic) UILabel *membershipViewText;
+@property (strong, nonatomic) NSString *membershipToGet;
+@property (strong, nonatomic) UILabel *membershipViewTextSummary;
+@property (strong, nonatomic) NSMutableArray *membershipButs;
+@property (strong, nonatomic)  NSMutableDictionary *membershipToBuyDict;
+@property (strong, nonatomic) UIView *membershipInfoView;
+
 -(void)setData:(NSDictionary*)myUser;
 
 -(void)openUser;
@@ -205,5 +227,7 @@
 -(BOOL)isUserLoggedIn;
 
 -(void)getUser;
+
+-(void)checkForAutoUserLogIn;
 
 @end

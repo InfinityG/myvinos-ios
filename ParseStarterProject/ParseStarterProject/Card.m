@@ -39,7 +39,7 @@
 {
     //border definitions
     CGFloat cornerRadius = 5;
-    CGFloat borderWidth = 0.2f;
+    CGFloat borderWidth = 0.4f;
     UIColor *lineColor = [UIColor lightGrayColor];
     
     //drawing

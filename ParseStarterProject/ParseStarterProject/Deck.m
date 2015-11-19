@@ -36,7 +36,7 @@
         // Initialization code
         NSLog(@"HELLO DECK %@",myTitle);
         
-        self.backgroundColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor clearColor];
         /*
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.bounds;
@@ -96,7 +96,7 @@
     blackCard.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
     blackCard.clipsToBounds = FALSE;
     //blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
-    blackCard.layer.cornerRadius = 5;
+    blackCard.layer.cornerRadius = 10;
     //blackCard.layer.shadowColor = [UIColor blackColor].CGColor;
     //blackCard.layer.shadowOffset = CGSizeMake(0, 0);
     //blackCard.layer.shadowOpacity = 0.75f;
@@ -111,7 +111,7 @@
         filterTxtLabel.textColor = [UIColor whiteColor];
         filterTxtLabel.userInteractionEnabled = TRUE;
         filterTxtLabel.alpha = 1;
-        [filterTxtLabel setText:@"DELIVER"];
+        [filterTxtLabel setText:@"DELIVER NOW"];
         [blackCard addSubview:filterTxtLabel];
         
     }
@@ -156,7 +156,7 @@
     
     //PROMPT BUTTON
     //ADD WINE COLOR
-    UIImageView *promptBut = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"plus-icon.png" ]];
+    UIImageView *promptBut = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"vinosButMore.png" ]];
     promptBut.frame = CGRectMake(self.bounds.size.width*0.9, filterTxt.bounds.origin.y, self.bounds.size.width*0.075, filterTxt.bounds.size.height);
     promptBut.backgroundColor = [UIColor clearColor];
     promptBut.contentMode = UIViewContentModeScaleAspectFit;
@@ -233,25 +233,7 @@
         //IS DELIVERY
         
         
-        //BUILD FORM
-        //ADD FORM
-        deliverTable = [[FormTableControllerDeliver alloc ]initWithStyle: UITableViewStyleGrouped];
-        deliverTable.myDelegate = self;
-        deliverTable.view.alpha = 1.0f;
-        deliverTable.view.backgroundColor = [UIColor clearColor];
-        deliverTable.view.frame = CGRectMake(blackCard.bounds.size.width*0.0,blackCard.bounds.size.height*0.5,blackCard.bounds.size.width*1.0,blackCard.bounds.size.height*0.5);
-        deliverTable.view.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
-        deliverTable.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        deliverTable.tableView.scrollEnabled = FALSE;
-        [blackCard addSubview:deliverTable.view];
-        
-        
-        
-        //BUILD ITEMS LIST
-         deliverItemsScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(deliverTable.view.bounds.size.width*0.005, deliverTable.view.bounds.size.height*0.52, deliverTable.view.bounds.size.width*0.99, deliverTable.view.bounds.size.height*0.4)];
-        deliverItemsScroll.backgroundColor = [UIColor clearColor];
-        //[deliverTable.view addSubview:deliverItemsScroll];
-
+        //ONLY WHERE MAP VIEW GOES
     }
     
     [self addSubview:blackCard];
@@ -416,21 +398,49 @@
     // blackCard.layer.shadowRadius = 10.0;
     
     
-    
-    
-    
-    UILabel *backCardHeading = [[UILabel alloc] initWithFrame:CGRectMake(backCard.bounds.size.width*0.05, backCard.bounds.size.height*0 ,backCard.bounds.size.width*0.8, FILTERTEXTHEIGHT)];
-    backCardHeading.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(backCardHeading.bounds.size.height*0.35)];
-    backCardHeading.textAlignment =  NSTextAlignmentLeft;
-    backCardHeading.backgroundColor = [UIColor clearColor];
-    backCardHeading.textColor = [UIColor whiteColor];
-    backCardHeading.userInteractionEnabled = TRUE;
-    backCardHeading.alpha = 1;
-    [backCardHeading setText:@"I'm in the MOOD for..."];
-    [backCard addSubview:backCardHeading];
-    
-    [blackCard addSubview:backCard];
+    if ([type isEqualToString:@"DELIVERY"]) {
 
+        //IS DELIVERY
+        //ADD FORM
+        deliverTable = [[FormTableControllerDeliver alloc ]initWithStyle: UITableViewStyleGrouped];
+        deliverTable.myDelegate = self;
+        deliverTable.view.alpha = 1.0f;
+        deliverTable.view.backgroundColor = [UIColor clearColor];
+        deliverTable.view.frame = CGRectMake(blackCard.bounds.size.width*0.0,blackCard.bounds.size.height*0.5,blackCard.bounds.size.width*1.0,blackCard.bounds.size.height*0.5);
+        deliverTable.view.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
+        deliverTable.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        deliverTable.tableView.scrollEnabled = FALSE;
+        [blackCard addSubview:deliverTable.view];
+        
+        
+        
+        //BUILD ITEMS LIST
+        deliverItemsScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(deliverTable.view.bounds.size.width*0.005, deliverTable.view.bounds.size.height*0.52, deliverTable.view.bounds.size.width*0.99, deliverTable.view.bounds.size.height*0.4)];
+        deliverItemsScroll.backgroundColor = [UIColor clearColor];
+        //[deliverTable.view addSubview:deliverItemsScroll];
+        
+        
+
+        
+    }
+    else{
+        //NOT DELIVERY
+        UILabel *backCardHeading = [[UILabel alloc] initWithFrame:CGRectMake(backCard.bounds.size.width*0.05, backCard.bounds.size.height*0 ,backCard.bounds.size.width*0.8, FILTERTEXTHEIGHT)];
+        backCardHeading.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(backCardHeading.bounds.size.height*0.35)];
+        backCardHeading.textAlignment =  NSTextAlignmentLeft;
+        backCardHeading.backgroundColor = [UIColor clearColor];
+        backCardHeading.textColor = [UIColor whiteColor];
+        backCardHeading.userInteractionEnabled = TRUE;
+        backCardHeading.alpha = 1;
+        [backCardHeading setText:@"I'm in the MOOD for..."];
+        [backCard addSubview:backCardHeading];
+        
+        [blackCard addSubview:backCard];
+
+    }
+    
+    
+    
 }
 
 
@@ -500,7 +510,12 @@
     _shapeLayer.frame = frame;
     _shapeLayer.masksToBounds = NO;
     [_shapeLayer setValue:[NSNumber numberWithBool:NO] forKey:@"isCircle"];
+    if([type isEqualToString:@"DELIVERY"]){
+    _shapeLayer.fillColor = [UIColor colorWithRed:255.0f/255.0f green:255.0f/255.0f blue:255.0f/255.0f alpha:1.0f].CGColor;
+    }
+    else{
     _shapeLayer.fillColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f].CGColor;
+    }
     _shapeLayer.strokeColor = [lineColor CGColor];
     _shapeLayer.lineWidth = borderWidth;
     //_shapeLayer.lineDashPattern = [NSArray arrayWithObjects:[NSNumber numberWithInt:dashPattern1], [NSNumber numberWithInt:dashPattern2], nil];
@@ -600,7 +615,8 @@
     if([type isEqualToString:@"DELIVERY"]){
         //BOX HOLDER
         fakeBoxHolder = [[UIView alloc] initWithFrame:CGRectMake(0,self.bounds.size.height*0.0125 ,self.bounds.size.width, self.bounds.size.height*0.15)];
-        fakeBoxHolder.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
+        //fakeBoxHolder.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
+        fakeBoxHolder.backgroundColor = [UIColor colorWithRed:255.0f/255.0f green:255.0f/255.0f blue:255.0f/255.0f alpha:1.0f];
         fakeBoxHolder.clipsToBounds = FALSE;
         fakeBoxHolder.alpha = 0;
         fakeBoxHolder.userInteractionEnabled = FALSE;
@@ -1556,7 +1572,7 @@ BOOL notScrolling = TRUE;
     backCard.alpha = 0;
     [UIView commitAnimations];
     
-    //SET SCROLL VIEW OFFSET
+    /*/SET SCROLL VIEW OFFSET
     if ([type isEqualToString:@"DELIVERY"]) {
         scrollView.frame = CGRectMake(0, self.bounds.size.height*0.6, self.bounds.size.width, self.bounds.size.height*0.4);
     }
@@ -1564,6 +1580,9 @@ BOOL notScrolling = TRUE;
         scrollView.frame = CGRectMake(0, self.bounds.size.height*0.1, self.bounds.size.width,self.bounds.size.height*0.9);
         [self.superview bringSubviewToFront:self];
     }
+    */
+    scrollView.frame = CGRectMake(0, self.bounds.size.height*0.1, self.bounds.size.width,self.bounds.size.height*0.9);
+    [self.superview bringSubviewToFront:self];
     
     NSLog(@"DECK 1");
     
@@ -1636,7 +1655,7 @@ BOOL notScrolling = TRUE;
     boxHolder.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*1.5- STARTPOINT);
     
     
-    
+    /*
     if ([type isEqualToString:@"DELIVERY"]) {
         if (PREVIEWHEIGHT * ([cards count]+1) < self.bounds.size.height*0.5) {
             //MOVE DOWN BY DIFFERENCE
@@ -1661,6 +1680,17 @@ BOOL notScrolling = TRUE;
         else{
             blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
         }
+    }
+     */
+    
+    if (PREVIEWHEIGHT * ([cards count]+1) < self.bounds.size.height*0.9) {
+        //MOVE DOWN BY DIFFERENCE
+        scrollView.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]), scrollView.bounds.size.width, self.bounds.size.height*0.9);
+        //BLACK CARD
+        blackCard.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]+1), blackCard.bounds.size.width, blackCard.bounds.size.height);
+    }
+    else{
+        blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
     }
 
     [UIView commitAnimations];

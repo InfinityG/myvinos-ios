@@ -143,7 +143,7 @@
             UIButton *loginBut = [UIButton buttonWithType:UIButtonTypeCustom];
             loginBut.frame = CGRectMake(cell.bounds.size.width*0.0,0,cell.bounds.size.width*0.5,cell.bounds.size.height);
             loginBut.backgroundColor = [UIColor clearColor];
-            [loginBut setTitle:@"VIEW ITEMS" forState:UIControlStateNormal];
+            [loginBut setTitle:@"BOTTLES" forState:UIControlStateNormal];
             [loginBut setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             loginBut.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(loginBut.bounds.size.height*0.4)];
             [loginBut addTarget:myDelegate action:@selector(activateDeck) forControlEvents:UIControlEventTouchUpInside];

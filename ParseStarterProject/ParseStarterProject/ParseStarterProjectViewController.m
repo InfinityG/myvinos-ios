@@ -31,11 +31,18 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioSession.h>
 
+
+#define MYVINOSSERVER @"https://myvinos-api.infinity-g.com"
+
+
+#define   DEGREES_TO_RADIANS(degrees)  ((3.14159265359 * degrees)/ 180)
+
+
 #define TOPNAVHEIGHT screenSize.height*0.11
 #define SELECTIONSCREENSIZE screenSize.height*0.89
 #define TOPNAV CGRectMake(0,0,screenSize.width,TOPNAVHEIGHT)
 #define CONTENTVIEW CGRectMake(0,TOPNAVHEIGHT,screenSize.width,SELECTIONSCREENSIZE)
-#define DELIVERVIEW CGRectMake(screenSize.width*0.025,screenSize.height*0.1,screenSize.width*0.95,SELECTIONSCREENSIZE*0.4)
+#define DELIVERVIEW CGRectMake(screenSize.width*0.025,screenSize.height*0.1,screenSize.width*0.95,SELECTIONSCREENSIZE*0.75)
 
 #define USERVIEW CGRectMake(0,TOPNAVHEIGHT,screenSize.width,SELECTIONSCREENSIZE*0.4)
 
@@ -369,8 +376,11 @@
 }
 
 
--(void)startLoadingNow{
+-(void)startLoadingNow:(NSString*)lStatus{
     NSLog(@"START LOADING");
+    
+    //SET LOADING LABEL
+    loadingLabel.text = lStatus;
     
     if(!inAppLoading){
         //START LOADING
@@ -386,8 +396,8 @@
         [UIView setAnimationDuration:0.15f];
         //MOVE/SET LOGO SIZE..
         logo.frame = CGRectMake(screenSize.width*0.325, 0, screenSize.width*0.35, screenSize.height);
-        loadingScreen2.layer.opacity = 1.0;
-        loadingScreen2.alpha = 1.0;
+        loadingScreen2.layer.opacity = 1.0f;
+        loadingScreen2.alpha = 1.0f;
         loadingLabel.alpha = 1.0f;
         loadingLabel2.alpha = 1.0f;
         [UIView commitAnimations];
@@ -434,7 +444,7 @@
         [logo stopAnimating];
         [logo setImage:[UIImage imageNamed:@"VinosBlank_00085.png"]];
         
-        //[logo addGestureRecognizer:logoTapped];
+        [logo addGestureRecognizer:logoTapped];
         
         //SHOW SCREEN - REMOVE LOADING SCREEN
         //[topNavHolder addSubview:logo];
@@ -551,7 +561,7 @@
     loadingScreen2.alpha = 0.0f;
     logoTapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openCloseUser)];
     logoTapped.numberOfTapsRequired = 1;
-    //[logo addGestureRecognizer:logoTapped];
+    [logo addGestureRecognizer:logoTapped];
     
     
      [topNavHolder addSubview:logo];
@@ -571,7 +581,10 @@
     [UIView commitAnimations];
     
     //SHOW USER SCREEN
-    [self openCloseUser];
+   // [self openCloseUser];
+    
+    //CHECK IF USER IS LOGGED IN AND LOG IN
+    [user checkForAutoUserLogIn];
 
 }
 
@@ -657,7 +670,7 @@
     selectionScreen = [[UIView alloc] initWithFrame:CONTENTVIEW];
     selectionScreen.backgroundColor = [UIColor clearColor];;
     selectionScreen.alpha = 1.0f;
-    selectionScreen.frame = CGRectMake(0, screenSize.height*0.45, selectionScreen.bounds.size.width, selectionScreen.bounds.size.height);
+    selectionScreen.frame = CGRectMake(0, TOPNAVHEIGHT, selectionScreen.bounds.size.width, selectionScreen.bounds.size.height);
     //selectionScreen.transform = CGAffineTransformMakeScale(0.55, 0.55);
     //selectionScreen.backgroundColor=[UIColor colorWithRed:163/255.0f green:118/255.0f blue:163/255.0f alpha:1.0f];
     
@@ -690,6 +703,10 @@
     user = [[User alloc] initWithFrame:USERVIEW];
     user.myDelegate = self;
     //user.alpha = 0.0f;
+    //user.frame = CONTENTVIEW;
+    user.frame = CGRectMake(0,-screenSize.height,screenSize.width,SELECTIONSCREENSIZE);
+    
+
     [self.view addSubview:user];
     
     
@@ -884,7 +901,7 @@
         deliverLabel.alpha = 1.0f;
         //logo.alpha = 1.0f;
         selectionScreen.alpha = 1.0f;
-        //user.frame = CGRectMake(0,-screenSize.height,screenSize.width,SELECTIONSCREENSIZE);
+        user.frame = CGRectMake(0,-screenSize.height,screenSize.width,SELECTIONSCREENSIZE);
         //selectionScreen.center = CGPointMake(selectionScreen.center.x, selectionScreen.center.y - screenSize.height);
         //deliveryDeck.transform = CGAffineTransformMakeScale(0.15f, 0.15f);
         //deliveryDeck.center = CGPointMake(screenSize.width * 0.2,screenSize.height * 0.2);
@@ -911,11 +928,11 @@
         //filterBut.alpha = 0.0f;
         //deckBut.alpha = 0.0f;
         //deliver.alpha = 0.0f;
-        deliverButton.alpha = 0.0f;
-        deliverLabel.alpha = 0.0f;
+        //deliverButton.alpha = 0.0f;
+        //deliverLabel.alpha = 0.0f;
         //logo.alpha = 0.0f;
         //selectionScreen.alpha = 0.0f;
-        //user.frame = CONTENTVIEW;
+        user.frame = CONTENTVIEW;
         //user.center = CGPointMake(user.center.x, user.center.y + SELECTIONSCREENSIZE);
         //selectionScreen.center = CGPointMake(selectionScreen.center.x, selectionScreen.center.y + screenSize.height);
         [UIView commitAnimations];
@@ -969,7 +986,7 @@
     [UIView commitAnimations];
     
     
-    //MOVE SELECTION SCREEN BACK TO BOTTOM
+    /*/MOVE SELECTION SCREEN BACK TO BOTTOM
     [UIView beginAnimations:NULL context:NULL];
     [UIView setAnimationDelegate:self];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
@@ -977,12 +994,14 @@
     [UIView setAnimationDelay:0.3f];
     selectionScreen.frame = CGRectMake(0, screenSize.height*0.45, selectionScreen.bounds.size.width, selectionScreen.bounds.size.height);
     [UIView commitAnimations];
-   
+   */
     
-    //SHOW CARD
+    /*/SHOW CARD
     userOpen = false;
     [self openCloseUser];
+    */
     
+    deliverButton.tag = 0;
 
     //REPOSITION ALL DEACTIVATED DECKS
     [self animateInDecks];
@@ -1139,7 +1158,7 @@
                     //CREATE NEW DECK
                     Deck *myDeck = [[Deck alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, SELECTIONSCREENSIZE) setTitle:[dictionary objectForKey:@"collection_title"] setImageUrl:[dictionary objectForKey:@"collection_image_url"] setImageDes:[dictionary objectForKey:@"collection_description"] setType:@"COLLECTION" ];
                     myDeck.myDelegate = self;
-                    myDeck.transform = CGAffineTransformMakeScale(0.3, 0.3);
+                    myDeck.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(0.3, 0.3), CGAffineTransformMakeRotation(DEGREES_TO_RADIANS(285))) ;
                     [myDeck addCardData:dictionary];
                     
                     [cardDecks addObject:myDeck];
@@ -1252,8 +1271,10 @@
     [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
     [UIView setAnimationDuration:0.75f];
     [UIView setAnimationDelay:0.5f];
-    //deck.frame = CGRectMake(colum*wid, row*hei, wid, hei);
-    deliveryDeck.center = CGPointMake(screenSize.width*0.5, screenSize.height*0.85);
+    //deliveryDeck.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(0.105, 0.105), CGAffineTransformMakeRotation(DEGREES_TO_RADIANS(0))) ;
+    //deliveryDeck.center = CGPointMake(screenSize.width*0.9, -screenSize.height*0.065);
+    deliveryDeck.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(0.3, 0.3), CGAffineTransformMakeRotation(DEGREES_TO_RADIANS(0))) ;
+    deliveryDeck.center = CGPointMake(screenSize.width*0.5, selectionScreen.bounds.size.height*0.85);
     [UIView commitAnimations];
     
     [selectionScreen addSubview:deliveryDeck];
@@ -1285,19 +1306,21 @@
         [UIView setAnimationDelegate:self];
         [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
         [UIView setAnimationDuration:0.55f];
-        deliveryDeck.center = CGPointMake(screenSize.width*0.5, selectionScreen.bounds.size.height*1.5);
+        //deliveryDeck.center = CGPointMake(screenSize.width*0.5, selectionScreen.bounds.size.height*1.5);
         [UIView commitAnimations];
         
         [self.view addSubview:selectionScreen];
         
-        //HIDE CARD
+        /*/HIDE CARD
         userOpen = true;
         [self openCloseUser];
+         */
     }
     else{
-        //SHOW CARD
+        /*/SHOW CARD
         userOpen = false;
         [self openCloseUser];
+         */
         
         [selectionScreen bringSubviewToFront:deliveryDeck];
         [self.view addSubview:user];
@@ -1314,7 +1337,7 @@
     //deckBut.alpha = 1.0f;
     //filterTxt.alpha = 1.0f;
     myDeck.center = CGPointMake(screenSize.width*0.5, selectionScreen.bounds.size.height*0.5);
-    myDeck.transform = CGAffineTransformMakeScale(1,1);
+    myDeck.transform = CGAffineTransformMakeScale(0.95,0.95);
     //topNavHolder.center = CGPointMake(topNavHolder.center.x, topNavHolder.bounds.size.height*0.5);
     //selectionScreen.frame = CGRectMake(-screenSize.width, screenSize.height - SELECTIONSCREENSIZE, selectionScreen.bounds.size.width, SELECTIONSCREENSIZE);
      [UIView commitAnimations];
@@ -1360,9 +1383,10 @@
     
     [deliver showCardView];
     
-    //CLOSE USER IF OPEN
+    /*/CLOSE USER IF OPEN
     userOpen = TRUE;
     [self openCloseUser];
+     */
     
     [UIView beginAnimations:NULL context:NULL];
     [UIView setAnimationDelegate:self];
@@ -1440,11 +1464,11 @@
    // deliverButton.frame = CGRectMake(self.view.bounds.size.height*0.0145f, self.view.bounds.size.height*0.005f , self.view.bounds.size.height*0.05, self.view.bounds.size.height*0.05);
     deliverButton.frame = CGRectMake(self.view.bounds.size.width*0.85f, self.view.bounds.size.height*0.005f , TOPNAVHEIGHT*0.55, TOPNAVHEIGHT*0.55);
     deliverButton.tag = 0;
-    [deliverButton setBackgroundImage:[UIImage imageNamed:@"deliverBut.png"] forState:UIControlStateNormal];
+    [deliverButton setBackgroundImage:[UIImage imageNamed:@"selectButton.png"] forState:UIControlStateNormal];
     [deliverButton addTarget:self action:@selector(showDeliverScreen) forControlEvents:UIControlEventTouchUpInside];
     deliverButton.alpha = 1.0f;
     deliverButton.center = CGPointMake(deliverButton.center.x, topNavHolder.center.y);
-   // [topNavHolder addSubview:deliverButton];
+    [topNavHolder addSubview:deliverButton];
     
     //ADD DELIVERY LABEL
     //deliverLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.bounds.size.height*0.08f, 0 , self.view.bounds.size.width*0.3, TOPNAVHEIGHT)];
@@ -1452,8 +1476,8 @@
     deliverLabel.backgroundColor = [UIColor clearColor];
     deliverLabel.alpha = 1.0f;
     deliverLabel.textAlignment =  NSTextAlignmentCenter;
-    deliverLabel.textColor = [UIColor whiteColor];
-    deliverLabel.font = [UIFont fontWithName:@"SFUIText-Regular" size:(deliverLabel.bounds.size.height*0.14)];
+    deliverLabel.textColor = [UIColor blackColor];
+    deliverLabel.font = [UIFont fontWithName:@"SFUIText-Regular" size:(deliverLabel.bounds.size.height*0.25)];
     deliverLabel.userInteractionEnabled = FALSE;
     [deliverLabel setText:@""];
     [topNavHolder addSubview:deliverLabel];
@@ -1469,7 +1493,7 @@
     
     
     //CREATE DELIVERY DECK
-    deliveryDeck = [[Deck alloc] initWithFrame:CGRectMake(0, SELECTIONSCREENSIZE, self.view.bounds.size.width, SELECTIONSCREENSIZE) setTitle:@"CHOOSE WINE FROM COLLECTIONS" setImageUrl:@"" setImageDes:@"The delivery Deck" setType:@"DELIVERY"];
+    deliveryDeck = [[Deck alloc] initWithFrame:CGRectMake(0, SELECTIONSCREENSIZE, self.view.bounds.size.width, SELECTIONSCREENSIZE) setTitle:@"CHOOSE WINE FROM COLLECTIONS" setImageUrl:@"http://s7.postimg.org/o9x5hef5n/deliver_Man.png" setImageDes:@"The delivery Deck" setType:@"DELIVERY"];
     deliveryDeck.myDelegate = self;
     //deliveryDeck.backgroundColor = [UIColor redColor];
      //[deliver insertSubview:deliveryDeck atIndex:0];
@@ -1661,8 +1685,8 @@
     [UIView setAnimationDelegate:self];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
     [UIView setAnimationDuration:0.45f];
-    //deliverLabel.alpha = 1.0f;
-    //deliverButton.alpha = 1.0f;
+    deliverLabel.alpha = 1.0f;
+    deliverButton.alpha = 1.0f;
     [UIView commitAnimations];
 }
 
@@ -1714,7 +1738,7 @@
 }
 
 
-- (void) showDeliverScreen
+- (void)showDeliverScreen
 {
     NSLog(@"DELIVER SCREEN - SHOW");
     
@@ -1730,7 +1754,9 @@
         //selectionScreen.alpha = 1;
         [UIView commitAnimations];
         
-        deliverButton.tag = 0;
+        
+        
+        [self showSelectionScreen];
     }
     else{
         [deliveryDeck activateDeck];
@@ -1741,7 +1767,8 @@
         [UIView setAnimationDuration:0.15f];
         //selectionScreen.alpha = 0;
         deliver.alpha = 1;
-        // deckBut.alpha = 0;
+        deliverButton.alpha = 0;
+        deliverLabel.alpha = 0;
         [UIView commitAnimations];
         
         deliverButton.tag = 1;
@@ -1779,7 +1806,7 @@
 -(void)loadCollectionData{
     
     //GET DATA
-    NSURLRequest *request = [NSURLRequest requestWithURL: [NSURL URLWithString:@"https://myvinos-api.infinity-g.com/products"]];
+    NSURLRequest *request = [NSURLRequest requestWithURL: [NSURL URLWithString:[NSString stringWithFormat:@"%@%@",MYVINOSSERVER,@"/products"]]];
     [[NSURLConnection alloc] initWithRequest:request delegate:self];
 
     
