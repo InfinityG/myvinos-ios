@@ -16,7 +16,7 @@
 #define CARDSTART -CARDHEIGHT
 #define CARDEND CARDHEIGHT*0.5
 
-#define URLEMail @"mailto:support@myvinos.club?subject=MyVinos Wine Wallet&body=Hi Could you please help me with..."
+#define URLEMail @"mailto:support@myvinos.club?subject=MyVinos APP request&body=Hello, I am interested in "
 
 #import "GMEllipticCurveCrypto.h"
 #import <Parse/Parse.h>
@@ -50,7 +50,7 @@ void freeRawData(void *info, const void *data, size_t size);
 
 @synthesize forgotTable,connectionForgot,dataForgot,jsonDataForgot,connectionReset,dataReset,jsonDataReset,goToCollection,menuView,userMenuView,menuCloseBut;
 
-@synthesize membershipView,membershipViewText,membershipToGet,membershipViewTextSummary,membershipButs,membershipToBuyDict,membershipInfoView,connectionMembership,dataMembership,jsonDataMembership;
+@synthesize membershipView,membershipViewText,membershipToGet,membershipViewTextSummary,membershipButs,membershipToBuyDict,membershipInfoView,connectionMembership,dataMembership,jsonDataMembership,bkLayer;
 
 int amountToBuy = 0;
 int membershipToGetAmount = 0;
@@ -64,13 +64,29 @@ int membershipToGetAmount = 0;
         userFound = FALSE;
         userJustSignedUp = FALSE;
         //DESIGN User
-        self.backgroundColor = [UIColor whiteColor];
+        //BACK GROUND
+        bkLayer = [[UIView alloc] initWithFrame:frame];
+        bkLayer.backgroundColor = [UIColor clearColor];
+        bkLayer.alpha = 1.0f;
+        bkLayer.userInteractionEnabled = YES;
+        [self addSubview:bkLayer];
+        
+        
+        //ADD TOCH TO CLOSE LAYER
+        UITapGestureRecognizer *tappedbkLayer= [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openCloseUserForce)];
+        tappedbkLayer.numberOfTapsRequired = 1;
+        [bkLayer addGestureRecognizer:tappedbkLayer];
+        
+        
+        self.backgroundColor = [UIColor clearColor];
+        self.alpha = 0.5f;
+        
         vinosButs = [[NSMutableArray alloc] init];
         membershipButs = [[NSMutableArray alloc] init];
         userButs = [[NSMutableArray alloc] init];
         topUps = [[NSMutableArray alloc] init];
         topUpsToBuy = [[NSMutableArray alloc] init];
-        welcomeTxtArr = [[NSArray alloc] initWithObjects:@"Your Wine Wallet\n\nWine delivered on-demand using VINOS. ",@"Activate your Wine Wallet.\n\nGet your wine delivered on-demand (Free for orders over 30 VINOS)\nEnjoy basic membership at no cost!",@"Become a Member\n\nGet Wine delivered to your door, delivery usually takes 15mins depending on traffic conditions.", nil];
+        welcomeTxtArr = [[NSArray alloc] initWithObjects:@"GET VINOS\n\Get VINOS to have wine delivered on-demand. ",@"SELECT\n\nYour wines from awesome cellar collections curated by professional sommeliers.",@"DELIVER\n\nYour selected wines on-demand, at the perfect temperature, directly from the cellar to wherever you choose.",@"JOIN AS A MEMBER\n\nSign up to own your share of the private cellar. Get your wine on-demand for no extra charge, including after-hours.", nil];
         [self addMemberView];
         
         [self addUserMenuView];
@@ -89,6 +105,17 @@ int membershipToGetAmount = 0;
         
     }
     return self;
+}
+
+-(void)openCloseUserForce{
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:0.2f];
+    self.alpha = 0.0f;
+    [UIView commitAnimations];
+
+    [myDelegate openCloseUser];
 }
 
 -(void)checkForAutoUserLogIn{
@@ -112,7 +139,7 @@ int membershipToGetAmount = 0;
         //DO NOTHING ------> FROM TUTORIAL SHOW SIGN UP SCREEN...
         
         //animate welcome text
-        [NSTimer scheduledTimerWithTimeInterval:3.5
+        [NSTimer scheduledTimerWithTimeInterval:3.75
                                          target:self
                                        selector:@selector(showTutNextText)
                                        userInfo:nil
@@ -185,7 +212,8 @@ int welcomeTxtCount = 0;
     loginButM = [UIButton buttonWithType:UIButtonTypeCustom];
     loginButM.frame = CGRectMake(signUpView.bounds.size.width*0.15,signUpView.bounds.size.height*0.8,signUpView.bounds.size.width*0.35,signUpView.bounds.size.height*0.125);
     loginButM.backgroundColor = [UIColor clearColor];
-    [loginButM setTitle:@"LOG IN" forState:UIControlStateNormal];
+    [loginButM setTitle:@"Log In" forState:UIControlStateNormal];
+    
     [loginButM setTitleColor:[UIColor colorWithRed:110.0f/255.0f green:0.0f/255.0f blue: 30.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
     loginButM.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(loginButM.bounds.size.height*0.6)];
     [loginButM addTarget:self action:@selector(showLogInForm) forControlEvents:UIControlEventTouchUpInside];
@@ -396,6 +424,7 @@ int welcomeTxtCount = 0;
     memberView.center = CGPointMake(self.center.x, CARDSTART);
     memberView.backgroundColor = [UIColor whiteColor];
     memberView.layer.cornerRadius = 5;
+    memberView.userInteractionEnabled = YES;
     memberView.layer.masksToBounds = NO;
     memberView.layer.shadowColor = [UIColor blackColor].CGColor;
     memberView.layer.shadowOffset = CGSizeMake(0, 0);
@@ -413,7 +442,7 @@ int welcomeTxtCount = 0;
     memberTit.backgroundColor = [UIColor clearColor];
     memberTit.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     memberTit.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(memberTit.bounds.size.height*0.8)];
-    memberTit.userInteractionEnabled = FALSE;
+    memberTit.userInteractionEnabled = TRUE;
     [memberTit setText:@"MEMBERSHIP CARD"];
     [memberView addSubview:memberTit];
     
@@ -425,7 +454,7 @@ int welcomeTxtCount = 0;
     refCode.backgroundColor = [UIColor clearColor];
     refCode.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     refCode.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(refCode.bounds.size.height*0.8)];
-    refCode.userInteractionEnabled = FALSE;
+    refCode.userInteractionEnabled = TRUE;
     [refCode setText:@""];
     [memberView addSubview:refCode];
     
@@ -435,7 +464,7 @@ int welcomeTxtCount = 0;
     memberTitle.backgroundColor = [UIColor clearColor];
     memberTitle.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     memberTitle.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(memberTitle.bounds.size.height*0.8)];
-    memberTitle.userInteractionEnabled = FALSE;
+    memberTitle.userInteractionEnabled = TRUE;
     [memberTitle setText:@""];
     [memberView addSubview:memberTitle];
     
@@ -448,18 +477,31 @@ int welcomeTxtCount = 0;
     memberRef.backgroundColor = [UIColor clearColor];
     memberRef.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     memberRef.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(memberRef.bounds.size.height*0.8)];
-    memberRef.userInteractionEnabled = FALSE;
+    memberRef.userInteractionEnabled = TRUE;
     [memberRef setText:@"Member of the Private Cellar"];
-    [memberView addSubview:memberRef];
+    //[memberView addSubview:memberRef];
+    
+    //ADD MEMBERSHIP VIEW BUTTON
+    UIButton *membershipViewBut = [UIButton buttonWithType:UIButtonTypeCustom];
+    membershipViewBut.frame = CGRectMake(memberView.bounds.size.width*0.025, memberView.bounds.size.height*0.8 , memberView.bounds.size.width*0.95, memberView.bounds.size.height*0.2);
+    membershipViewBut.tag = 1;
+    [membershipViewBut setTitle:@"UPGRADE MEMBERSHIP" forState:UIControlStateNormal];
+    [membershipViewBut setTitleColor:[UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
+    membershipViewBut.font = [UIFont systemFontOfSize:(membershipViewBut.bounds.size.height*0.3)];
+    [membershipViewBut addTarget:self action:@selector(openUserMembership) forControlEvents:UIControlEventTouchUpInside];
+    [memberView addSubview:membershipViewBut];
     
    //ADD INFO BUTTONS ON MEMBER VIEW
     //ADD SETTINGS BUTTON
     UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    settingsButton.frame = CGRectMake(memberView.bounds.size.width*0.025, memberView.bounds.size.height*0.95-memberView.bounds.size.width*0.1 , memberView.bounds.size.width*0.1, memberView.bounds.size.width*0.1);
+    settingsButton.frame = CGRectMake(memberView.bounds.size.width*0.025, memberView.bounds.size.height*0.025 , memberView.bounds.size.width*0.1, memberView.bounds.size.width*0.1);
     settingsButton.tag = 55;
-    [settingsButton setBackgroundImage:[UIImage imageNamed:@"settingsBut.png"]  forState:UIControlStateNormal];
+    [settingsButton setBackgroundImage:[UIImage imageNamed:@"infoBut.png"]  forState:UIControlStateNormal];
     [settingsButton addTarget:self action:@selector(openCloseMenu:) forControlEvents:UIControlEventTouchUpInside];
     [memberView addSubview:settingsButton];
+    
+   
+
     
     //ADD HIGHIGHT VIEW
     highlightView = [[UIView alloc]initWithFrame:memberView.bounds];
@@ -469,76 +511,8 @@ int welcomeTxtCount = 0;
     highlightView.layer.masksToBounds = NO;
     [memberView addSubview:highlightView];
     
-    ///////////
-    //ADD CREDIT INFO
-    ///////////
-
-    contactInfoView = [[UIView alloc] initWithFrame:CGRectMake(CARDRECT)];
-    contactInfoView.backgroundColor = [UIColor whiteColor];
-    contactInfoView.alpha = 0.0f;
-    contactInfoView.layer.cornerRadius = 5;
-    [memberView addSubview:contactInfoView];
-    
-    //CREDIT TITLE
-    UILabel *creditTopLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, contactInfoView.bounds.size.height*0.1 ,contactInfoView.bounds.size.width, contactInfoView.bounds.size.height*0.08)];
-    creditTopLabel.textAlignment =  NSTextAlignmentCenter;
-    creditTopLabel.backgroundColor = [UIColor clearColor];
-    creditTopLabel.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
-    creditTopLabel.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(creditTopLabel.bounds.size.height*0.8)];
-    creditTopLabel.userInteractionEnabled = FALSE;
-    [creditTopLabel setText:@"HOW MAY WE HELP YOU?"];
-    [contactInfoView addSubview:creditTopLabel];
-    
-   
     
     
-    //CREDIT DESCRIPTION
-    UITextView *creditDes=[[UITextView alloc] initWithFrame:CGRectMake(contactInfoView.bounds.size.width*0.1, contactInfoView.bounds.size.height*0.2, contactInfoView.bounds.size.width*0.8, contactInfoView.bounds.size.height*0.6)];
-    creditDes.backgroundColor = [UIColor clearColor];
-    creditDes.textAlignment = NSTextAlignmentCenter;
-    creditDes.font = [UIFont fontWithName:@"SFUIDisplay-Light" size:(creditDes.bounds.size.height*0.11)];
-    creditDes.alpha = 1.0f;
-    creditDes.userInteractionEnabled = FALSE;
-    creditDes.text = @"Please email, send a text or call us for immediate assistance during the cellar operating hours (12:00 - 22:00 daily).\n\nVisit myvinos.club/about for more information.\n\nIn Vinos Veritas!";
-    [contactInfoView addSubview:creditDes];
-    
-    
-    //CALL
-    UILabel *callBut = [[UILabel alloc] initWithFrame:CGRectMake(contactInfoView.bounds.size.width*0.05, contactInfoView.bounds.size.height*0.85 ,contactInfoView.bounds.size.width*0.5, contactInfoView.bounds.size.height*0.08)];
-    callBut.textAlignment =  NSTextAlignmentLeft;
-    callBut.backgroundColor = [UIColor clearColor];
-    callBut.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
-    callBut.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(callBut.bounds.size.height*0.8)];
-    callBut.userInteractionEnabled = TRUE;
-    [callBut setText:@"+27 (78) 7860307"];
-    [contactInfoView addSubview:callBut];
-    
-    UITapGestureRecognizer *tapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(makeCall)];
-    tapped.numberOfTapsRequired = 1;
-    [callBut addGestureRecognizer:tapped];
-    
-    //MAIL
-    UILabel *mailbut = [[UILabel alloc] initWithFrame:CGRectMake(contactInfoView.bounds.size.width*0.50, contactInfoView.bounds.size.height*0.85 ,contactInfoView.bounds.size.width*0.45, contactInfoView.bounds.size.height*0.08)];
-    mailbut.textAlignment =  NSTextAlignmentRight;
-    mailbut.backgroundColor = [UIColor clearColor];
-    mailbut.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
-    mailbut.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(mailbut.bounds.size.height*0.8)];
-    mailbut.userInteractionEnabled = TRUE;
-    [mailbut setText:@"SUPPORT@myvinos.club"];
-    [contactInfoView addSubview:mailbut];
-    
-    UITapGestureRecognizer *tapped2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(makeMail)];
-    tapped2.numberOfTapsRequired = 1;
-    [mailbut addGestureRecognizer:tapped2];
-    
-    
-    //ADD CONTACT INFO BUTTON
-    infoBut = [UIButton buttonWithType:UIButtonTypeCustom];
-    infoBut.frame = CGRectMake(contactInfoView.bounds.size.width*0.025, contactInfoView.bounds.size.width*0.025 , contactInfoView.bounds.size.width*0.1, contactInfoView.bounds.size.width*0.1);
-    infoBut.tag = 1;
-    [infoBut setBackgroundImage:[UIImage imageNamed:@"infoBut.png"]  forState:UIControlStateNormal];
-    [infoBut addTarget:self action:@selector(openCloseContact:) forControlEvents:UIControlEventTouchUpInside];
-    [memberView addSubview:infoBut];
     
     //ADD CREDIT BUTTON
     UIButton *infoCreditButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -549,13 +523,6 @@ int welcomeTxtCount = 0;
     [memberView addSubview:infoCreditButton];
     
     
-    //ADD MEMBERSHIP VIEW BUTTON
-    UIButton *membershipViewBut = [UIButton buttonWithType:UIButtonTypeCustom];
-    membershipViewBut.frame = CGRectMake(contactInfoView.bounds.size.width - contactInfoView.bounds.size.width*0.125, contactInfoView.bounds.size.height*0.825 , contactInfoView.bounds.size.width*0.095, contactInfoView.bounds.size.width*0.095);
-    membershipViewBut.tag = 1;
-    [membershipViewBut setBackgroundImage:[UIImage imageNamed:@"vinosBut.png"]  forState:UIControlStateNormal];
-    [membershipViewBut addTarget:self action:@selector(openUserMembership) forControlEvents:UIControlEventTouchUpInside];
-    [memberView addSubview:membershipViewBut];
     
     
     
@@ -592,15 +559,44 @@ int welcomeTxtCount = 0;
     QRcodeImg.backgroundColor = [UIColor whiteColor];
         QRcodeImg.tag = 1;
         QRcodeImg.userInteractionEnabled = TRUE;
-    [memberView insertSubview:QRcodeImg belowSubview:contactInfoView];
+    [memberView insertSubview:QRcodeImg atIndex:0];
     
     /*/ADD FULLSCREEN CARD TAP
     UITapGestureRecognizer *tapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openCloseCardDisplay)];
     tapped.numberOfTapsRequired = 1;
     [QRcodeImg addGestureRecognizer:tapped];
       */
+     }
+        //SET CARD BK
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         
-    }
+        
+        NSLog(@"WHAT THE FUCK2 %@",[defaults objectForKey:@"membership_type"]);
+        
+        if ([[[defaults objectForKey:@"membership_type"] uppercaseString] isEqualToString:@"BASIC"]) {
+           deliveryHistoryView.backgroundColor = creditHistoryView.backgroundColor = creditInfoView.backgroundColor = membershipInfoView.backgroundColor = contactInfoView.backgroundColor = userMenuView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor whiteColor];
+            NSLog(@"BASIC MEM_TYPEE");
+        }
+        else if ([[[defaults objectForKey:@"membership_type"] uppercaseString] isEqualToString:@"SILVER"]){
+             deliveryHistoryView.backgroundColor = creditHistoryView.backgroundColor = creditInfoView.backgroundColor = membershipInfoView.backgroundColor = contactInfoView.backgroundColor = userMenuView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor colorWithRed:223.0f/255.0f green:223.0f/255.0f blue: 223.0f/255.0f alpha:1.0f];
+            NSLog(@"SILVER MEM_TYPEE");
+            
+        }
+        else if ([[[defaults objectForKey:@"membership_type"] uppercaseString] isEqualToString:@"GOLD"]){
+             deliveryHistoryView.backgroundColor = creditHistoryView.backgroundColor = creditInfoView.backgroundColor = membershipInfoView.backgroundColor = contactInfoView.backgroundColor = userMenuView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor colorWithRed:212.0f/255.0f green:176.0f/255.0f blue: 91.0f/255.0f alpha:1.0f];
+            NSLog(@"GOLD MEM_TYPEE");
+            
+        }
+        else if ([[[defaults objectForKey:@"membership_type"] uppercaseString] isEqualToString:@"PLATINUM"]){
+             deliveryHistoryView.backgroundColor = creditHistoryView.backgroundColor = creditInfoView.backgroundColor = membershipInfoView.backgroundColor = contactInfoView.backgroundColor = userMenuView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor colorWithRed:212.0f/255.0f green:212.0f/255.0f blue: 212.0f/255.0f alpha:1.0f];
+            NSLog(@"PLATINUM MEM_TYPEE");
+            
+        }
+        else{
+            NSLog(@"WHAT THE FUCK %@ %@",[defaults objectForKey:@"membership_type"],[[defaults objectForKey:@"membership_type"] uppercaseString]);
+        }
+        
+    
     
 }
 
@@ -695,6 +691,80 @@ int welcomeTxtCount = 0;
     [userButs addObject:userBut4];
     
     
+    ///////////
+    //ADD CREDIT INFO
+    ///////////
+    
+    contactInfoView = [[UIView alloc] initWithFrame:CGRectMake(CARDRECT)];
+    contactInfoView.backgroundColor = [UIColor whiteColor];
+    contactInfoView.alpha = 0.0f;
+    contactInfoView.layer.cornerRadius = 5;
+    contactInfoView.userInteractionEnabled = YES;
+    [userMenuView addSubview:contactInfoView];
+    
+    //CREDIT TITLE
+    UILabel *creditTopLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, contactInfoView.bounds.size.height*0.1 ,contactInfoView.bounds.size.width, contactInfoView.bounds.size.height*0.08)];
+    creditTopLabel.textAlignment =  NSTextAlignmentCenter;
+    creditTopLabel.backgroundColor = [UIColor clearColor];
+    creditTopLabel.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
+    creditTopLabel.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(creditTopLabel.bounds.size.height*0.8)];
+    creditTopLabel.userInteractionEnabled = FALSE;
+    [creditTopLabel setText:@"HOW MAY WE HELP YOU?"];
+    [contactInfoView addSubview:creditTopLabel];
+    
+    
+    
+    //CREDIT DESCRIPTION
+    UITextView *creditDes=[[UITextView alloc] initWithFrame:CGRectMake(contactInfoView.bounds.size.width*0.1, contactInfoView.bounds.size.height*0.2, contactInfoView.bounds.size.width*0.8, contactInfoView.bounds.size.height*0.6)];
+    creditDes.backgroundColor = [UIColor clearColor];
+    creditDes.textAlignment = NSTextAlignmentCenter;
+    creditDes.font = [UIFont fontWithName:@"SFUIDisplay-Light" size:(creditDes.bounds.size.height*0.11)];
+    creditDes.alpha = 1.0f;
+    creditDes.userInteractionEnabled = FALSE;
+    creditDes.text = @"Please email, send a text or call us for immediate assistance during the cellar operating hours (12:00 - 22:00 daily).\n\nVisit myvinos.club/about for more information.\n\nIn Vinos Veritas!";
+    [contactInfoView addSubview:creditDes];
+    
+    
+    //CALL
+    UILabel *callBut = [[UILabel alloc] initWithFrame:CGRectMake(contactInfoView.bounds.size.width*0.05, contactInfoView.bounds.size.height*0.85 ,contactInfoView.bounds.size.width*0.5, contactInfoView.bounds.size.height*0.08)];
+    callBut.textAlignment =  NSTextAlignmentLeft;
+    callBut.backgroundColor = [UIColor clearColor];
+    callBut.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
+    callBut.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(callBut.bounds.size.height*0.8)];
+    callBut.userInteractionEnabled = TRUE;
+    [callBut setText:@"+27 (78) 7860307"];
+    [contactInfoView addSubview:callBut];
+    
+    UITapGestureRecognizer *tapped = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(makeCall)];
+    tapped.numberOfTapsRequired = 1;
+    [callBut addGestureRecognizer:tapped];
+    
+    //MAIL
+    UILabel *mailbut = [[UILabel alloc] initWithFrame:CGRectMake(contactInfoView.bounds.size.width*0.50, contactInfoView.bounds.size.height*0.85 ,contactInfoView.bounds.size.width*0.45, contactInfoView.bounds.size.height*0.08)];
+    mailbut.textAlignment =  NSTextAlignmentRight;
+    mailbut.backgroundColor = [UIColor clearColor];
+    mailbut.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
+    mailbut.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(mailbut.bounds.size.height*0.8)];
+    mailbut.userInteractionEnabled = TRUE;
+    [mailbut setText:@"SUPPORT@myvinos.club"];
+    [contactInfoView addSubview:mailbut];
+    
+    UITapGestureRecognizer *tapped2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(makeMail)];
+    tapped2.numberOfTapsRequired = 1;
+    [mailbut addGestureRecognizer:tapped2];
+    
+
+    
+    
+    //ADD CONTACT INFO BUTTON
+    infoBut = [UIButton buttonWithType:UIButtonTypeCustom];
+    infoBut.frame = CGRectMake(contactInfoView.bounds.size.width*0.025, contactInfoView.bounds.size.width*0.025 , contactInfoView.bounds.size.width*0.1, contactInfoView.bounds.size.width*0.1);
+    infoBut.tag = 1;
+    [infoBut setBackgroundImage:[UIImage imageNamed:@"infoBut.png"]  forState:UIControlStateNormal];
+    [infoBut addTarget:self action:@selector(openCloseContact:) forControlEvents:UIControlEventTouchUpInside];
+    [userMenuView addSubview:infoBut];
+    
+    
     //ADD CREDIT HISTORY
     creditHistoryView = [[UIScrollView alloc] initWithFrame:userMenuView.frame];
     creditHistoryView.delegate = self;
@@ -774,9 +844,9 @@ int welcomeTxtCount = 0;
     UIButton *selectButton1 = [UIButton buttonWithType:UIButtonTypeCustom];
     selectButton1.frame = CGRectMake(membershipView.bounds.size.width*0.05, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
     [[selectButton1 imageView] setContentMode: UIViewContentModeScaleAspectFit];
-    [selectButton1 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    [selectButton1 setBackgroundImage:[UIImage imageNamed:@"memButBASIC.png"]  forState:UIControlStateNormal];
     selectButton1.tag = 1;
-    selectButton1.alpha = 0.5f;
+    selectButton1.alpha = 0.85f;
     [selectButton1 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
     //selectButton1.contentMode = UIViewContentModeScaleAspectFit;
     [membershipView addSubview:selectButton1];
@@ -785,9 +855,9 @@ int welcomeTxtCount = 0;
     UIButton *selectButton2 = [UIButton buttonWithType:UIButtonTypeCustom];
     selectButton2.frame = CGRectMake(membershipView.bounds.size.width*0.275, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
     [[selectButton2 imageView] setContentMode: UIViewContentModeScaleAspectFit];
-    [selectButton2 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    [selectButton2 setBackgroundImage:[UIImage imageNamed:@"memButSILVER.png"]  forState:UIControlStateNormal];
     selectButton2.tag = 2;
-    selectButton2.alpha = 0.5f;
+    selectButton2.alpha = 0.85f;
     [selectButton2 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
     //selectButton2.contentMode = UIViewContentModeScaleAspectFit;
     [membershipView addSubview:selectButton2];
@@ -796,9 +866,9 @@ int welcomeTxtCount = 0;
     UIButton *selectButton3 = [UIButton buttonWithType:UIButtonTypeCustom];
     selectButton3.frame = CGRectMake(membershipView.bounds.size.width*0.5, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
     [[selectButton3 imageView] setContentMode: UIViewContentModeScaleAspectFit];
-    [selectButton3 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    [selectButton3 setBackgroundImage:[UIImage imageNamed:@"memButGOLD.png"]  forState:UIControlStateNormal];
     selectButton3.tag = 3;
-    selectButton3.alpha = 0.5f;
+    selectButton3.alpha = 0.85f;
     [selectButton3 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
     //selectButton3.contentMode = UIViewContentModeScaleAspectFit;
     [membershipView addSubview:selectButton3];
@@ -807,9 +877,9 @@ int welcomeTxtCount = 0;
     UIButton *selectButton4 = [UIButton buttonWithType:UIButtonTypeCustom];
     selectButton4.frame = CGRectMake(membershipView.bounds.size.width*0.725, membershipView.bounds.size.height*0.22 , membershipView.bounds.size.width*0.225, membershipView.bounds.size.width*0.225);
     [[selectButton4 imageView] setContentMode: UIViewContentModeScaleAspectFit];
-    [selectButton4 setBackgroundImage:[UIImage imageNamed:@"selectButton.png"]  forState:UIControlStateNormal];
+    [selectButton4 setBackgroundImage:[UIImage imageNamed:@"memButPLATINUM.png"]  forState:UIControlStateNormal];
     selectButton4.tag = 4;
-    selectButton4.alpha = 0.5f;
+    selectButton4.alpha = 0.85f;
     [selectButton4 addTarget:self action:@selector(butMembershipSelected:) forControlEvents:UIControlEventTouchUpInside];
     //selectButton4.contentMode = UIViewContentModeScaleAspectFit;
     [membershipView addSubview:selectButton4];
@@ -871,7 +941,7 @@ int welcomeTxtCount = 0;
     creditDes.font = [UIFont fontWithName:@"SFUIDisplay-Light" size:(creditDes.bounds.size.height*0.1)];
     creditDes.alpha = 1.0f;
     creditDes.userInteractionEnabled = FALSE;
-    creditDes.text = @"Memberships are for the most private guests\nVINOS membershisfjidn dsfdsf jsdf sf hdf  f\nVINOS gets topped up the next working day, to keep you within liqur regulations";
+    creditDes.text = @"JOIN AS A MEMBER\n\nOwn your share of the private cellar. Get your wine delivered for no extra charge, including after-hours.\n\nYour VINOS will be automatically topped up.";
     [membershipInfoView addSubview:creditDes];
     
     
@@ -976,7 +1046,7 @@ int welcomeTxtCount = 0;
     topLabel.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     topLabel.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(topLabel.bounds.size.height*0.8)];
     topLabel.userInteractionEnabled = FALSE;
-    [topLabel setText:@"TAP TO GET VINOS"];
+    [topLabel setText:@"GET MORE VINOS FOR YOUR MEMBERSHIP"];
     [buttonsView addSubview:topLabel];
     
     //ADD TOTAL LABEL
@@ -1170,7 +1240,7 @@ selectButton4.tag = 4;
     //CREDIT HISTORY TITLE
     UILabel *creditTopLabelHistory = [[UILabel alloc] initWithFrame:CGRectMake(0, deliveryHistoryView.bounds.size.height*0.08 ,deliveryHistoryView.bounds.size.width, deliveryHistoryView.bounds.size.height*0.08)];
     creditTopLabelHistory.textAlignment =  NSTextAlignmentCenter;
-    creditTopLabelHistory.backgroundColor =  [UIColor whiteColor];
+    creditTopLabelHistory.backgroundColor =  [UIColor clearColor];
     creditTopLabelHistory.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     creditTopLabelHistory.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(creditTopLabelHistory.bounds.size.height*0.8)];
     creditTopLabelHistory.userInteractionEnabled = FALSE;
@@ -1180,13 +1250,13 @@ selectButton4.tag = 4;
     
     
     //BUILD SCROLL VIEW
-    UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:CGRectMake(deliveryHistoryView.bounds.size.width*0.005, deliveryHistoryView.bounds.size.height*0.2, deliveryHistoryView.bounds.size.width*0.99, deliveryHistoryView.bounds.size.height*0.8)];
+    UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:CGRectMake(deliveryHistoryView.bounds.size.width*0.005, deliveryHistoryView.bounds.size.height*0.2, deliveryHistoryView.bounds.size.width*0.99, deliveryHistoryView.bounds.size.height*0.75)];
     
     
     
     //ADD TO VIEW
     int i = 0;
-    CGFloat barHeight = self.frame.size.height*0.12;
+    CGFloat barHeight = deliveryHistoryView.frame.size.height*0.12;
     
     
     //CREATE AND SORT HISTORY
@@ -1198,7 +1268,7 @@ selectButton4.tag = 4;
     
     
     for (NSDictionary *dictionary in mySortedArray) {
-        //  NSLog(@"\n\nTRANSACTION HISTORY FOUND - %@",dictionary);
+          NSLog(@"\n\nTRANSACTION HISTORY FOUND - %@",dictionary);
         if ([[dictionary objectForKey:@"type"] isEqualToString:@"vin_redemption"]) {
             //BUILD HISTORY SCROLL
             
@@ -1253,7 +1323,7 @@ selectButton4.tag = 4;
         
     }
     scrollview.contentSize = CGSizeMake(scrollview.frame.size.width, barHeight *i);
-    scrollview.backgroundColor = [UIColor whiteColor];
+    scrollview.backgroundColor = [UIColor clearColor];
     [deliveryHistoryView addSubview:scrollview];
     
     //[transactionHistoryTxt sizeToFit]; //added
@@ -1280,7 +1350,7 @@ selectButton4.tag = 4;
     //CREDIT HISTORY TITLE
     UILabel *creditTopLabelHistory = [[UILabel alloc] initWithFrame:CGRectMake(0, creditHistoryView.bounds.size.height*0.08 ,creditHistoryView.bounds.size.width, creditHistoryView.bounds.size.height*0.08)];
     creditTopLabelHistory.textAlignment =  NSTextAlignmentCenter;
-    creditTopLabelHistory.backgroundColor =  [UIColor whiteColor];
+    creditTopLabelHistory.backgroundColor =  [UIColor clearColor];
     creditTopLabelHistory.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
     creditTopLabelHistory.font = [UIFont fontWithName:@"SFUIDisplay-Ultralight" size:(creditTopLabelHistory.bounds.size.height*0.8)];
     creditTopLabelHistory.userInteractionEnabled = FALSE;
@@ -1290,13 +1360,13 @@ selectButton4.tag = 4;
     
     
     //BUILD SCROLL VIEW
-    UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:CGRectMake(creditHistoryView.bounds.size.width*0.005, creditHistoryView.bounds.size.height*0.2, creditHistoryView.bounds.size.width*0.99, creditHistoryView.bounds.size.height*0.8)];
+    UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:CGRectMake(creditHistoryView.bounds.size.width*0.005, creditHistoryView.bounds.size.height*0.2, creditHistoryView.bounds.size.width*0.99, creditHistoryView.bounds.size.height*0.75)];
     
     
     
     //ADD TO VIEW
     int i = 0;
-    CGFloat barHeight = self.frame.size.height*0.12;
+    CGFloat barHeight = creditHistoryView.frame.size.height*0.12;
     
     
     //CREATE AND SORT HISTORY
@@ -1363,7 +1433,7 @@ selectButton4.tag = 4;
   
     }
     scrollview.contentSize = CGSizeMake(scrollview.frame.size.width, barHeight *i);
-    scrollview.backgroundColor = [UIColor whiteColor];
+    scrollview.backgroundColor = [UIColor clearColor];
     [creditHistoryView addSubview:scrollview];
     
     //[transactionHistoryTxt sizeToFit]; //added
@@ -1593,7 +1663,15 @@ selectButton4.tag = 4;
 
 -(void)openUser{
     NSLog(@"\nOPEN USER");
-
+    
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+    [UIView setAnimationDuration:1.0f];
+    self.alpha = 1.0f;
+    [UIView commitAnimations];
+    
+    bkLayer.frame = ((ParseStarterProjectViewController*)myDelegate).view.frame;
     
     //SHOW MEMBER VIEW
     CALayer *layerMember = memberView.layer;
@@ -1695,13 +1773,14 @@ selectButton4.tag = 4;
          */
     }
     else{
-        //SHOW INFO TO USER
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Members only"
+        /*/SHOW INFO TO USER
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Private Membership"
                                                         message:@"Sign up for FREE to GET VINOS and use them to have your items delivered to you till late."
                                                        delegate:self
                                               cancelButtonTitle:@"Thanks"
                                               otherButtonTitles:nil];
         [alert show];
+         */
     }
     
     
@@ -1713,8 +1792,11 @@ selectButton4.tag = 4;
     
     //open direct view
     if (userFound) {
+        buttonsView.alpha = 0.0f;
         membershipView.alpha = 1.0f;
         [self flipOpenCard];
+        
+        [self promptMembershipSelection];
         /*
          [UIView beginAnimations:NULL context:NULL];
          [UIView setAnimationDelegate:self];
@@ -1726,13 +1808,14 @@ selectButton4.tag = 4;
          */
     }
     else{
-        //SHOW INFO TO USER
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Members only"
-                                                        message:@"Sign up for FREE to GET VINOS and use them to have your items delivered to you till late."
+        /*/SHOW INFO TO USER
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Private Membership"
+                                                        message:@"Sign up for FREE and GET VINOS and use them to have your items delivered to you till late."
                                                        delegate:self
                                               cancelButtonTitle:@"Thanks"
                                               otherButtonTitles:nil];
         [alert show];
+         */
     }
     
     
@@ -1780,6 +1863,8 @@ selectButton4.tag = 4;
     [membershipViewText setText:@"SELECT MEMBERSHIP TO BUY"];
     
     [myDelegate updateTempVinosAmount:membershipToGetAmount];
+    
+    [self updateUserStats];
 }
 
 
@@ -1946,7 +2031,7 @@ selectButton4.tag = 4;
 
 
 -(void)promptMembershipSelection{
-    NSLog(@"PROMPT VINOS SELECTION");
+    NSLog(@"PROMPT MEMBERSHIP SELECTION");
     
     float delay = CARDANIMATION + CARDDELAY;
     for(UIButton *memButs in membershipButs) {
@@ -1961,7 +2046,7 @@ selectButton4.tag = 4;
         delay=delay+0.05f;
     }
     
-    NSTimer *myTimer = [NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector(promptVinosSelectionEnd) userInfo:nil repeats:NO];
+    NSTimer *myTimer = [NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector(promptMembershipSelectionEnd) userInfo:nil repeats:NO];
     
     //[NSTimer timerWithTimeInterval:delay target:self selector:@selector(promptSelection:) userInfo:NULL repeats:NO];
     
@@ -2001,7 +2086,7 @@ selectButton4.tag = 4;
      [UIView setAnimationDuration:0.15f];
      for(UIButton *but in [membershipButs reverseObjectEnumerator]) {
      if(but.tag == sender.tag) but.alpha = 1.0f;
-     else but.alpha = 0.2f;
+     else but.alpha = 0.85f;
      }
      [UIView commitAnimations];
     
@@ -2020,6 +2105,8 @@ selectButton4.tag = 4;
             membershipToGetAmount = 0;
              membershipToGet = @"FREE";
             
+            membershipInfoView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor whiteColor];
+
             
             //CREATE
             membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -2035,9 +2122,11 @@ selectButton4.tag = 4;
         {
             //SILVER
             NSLog(@"\nGET SILVER MEMBERSHIP ");
-            membershipToGetAmount = 100;
+            membershipToGetAmount = 15;
             membershipToGet = @"SILVER";
             
+            membershipInfoView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor colorWithRed:223.0f/255.0f green:223.0f/255.0f blue: 223.0f/255.0f alpha:1.0f];
+
             //CREATE
             membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                               @"72685", @"product_id",
@@ -2051,12 +2140,14 @@ selectButton4.tag = 4;
         {
             //GOLD
             NSLog(@"\nGET GOLD MEMBERSHIP ");
-            membershipToGetAmount = 250;
+            membershipToGetAmount = 45;
             membershipToGet = @"GOLD";
-            
+
+            membershipInfoView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor colorWithRed:212.0f/255.0f green:176.0f/255.0f blue: 91.0f/255.0f alpha:1.0f];
+
             //CREATE
            membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                              @"72340", @"product_id",
+                                              @"72690", @"product_id",
                                               @"1", @"quantity",
                                               nil];
             
@@ -2068,12 +2159,14 @@ selectButton4.tag = 4;
         {
             //PLATINUM
             NSLog(@"\nGET PLATINUM MEMBERSHIP ");
-            membershipToGetAmount = 500;
+            membershipToGetAmount = 250;
             membershipToGet = @"PLATINUM";
             
+            membershipInfoView.backgroundColor = membershipView.backgroundColor = buttonsView.backgroundColor = memberView.backgroundColor = [UIColor colorWithRed:212.0f/255.0f green:212.0f/255.0f blue: 212.0f/255.0f alpha:1.0f];
+
             //CREATE
             membershipToBuyDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                              @"72340", @"product_id",
+                                              @"72813", @"product_id",
                                               @"1", @"quantity",
                                               nil];
             
@@ -2369,7 +2462,8 @@ selectButton4.tag = 4;
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     NSLog(@"touched in UseR");
    
-
+    
+    
 }
 
 
@@ -2457,11 +2551,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     
     if([logInTable.password length] > 0 && [logInTable.email length] > 0){
         //LOADING IMAGE
-        [(ParseStarterProjectViewController*)myDelegate startLoadingNow:@"Loggin In"];
-        
-       
-        
-        
+        [(ParseStarterProjectViewController*)myDelegate startLoadingNow:@"Logging In"];
         
         
         //GET DATA
@@ -2503,7 +2593,7 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
     }
     else{
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Check your details"
-                                                        message:@"Enter your username and password to gain access to your membership to use your VINOS and have your items delivered to you."
+                                                        message:@"Enter your username and password to gain access to your membership to use your VINOS to have your items delivered to you."
                                                        delegate:self
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
@@ -2948,9 +3038,9 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
             [[NSUserDefaults standardUserDefaults] setObject:[jsonDataUser objectForKey:@"email"] forKey:@"email"];
             [[NSUserDefaults standardUserDefaults] setObject:[jsonDataUser objectForKey:@"balance"] forKey:@"balance"];
             [[NSUserDefaults standardUserDefaults] setObject:[jsonDataUser objectForKey:@"third_party_id"] forKey:@"third_party_id"];
+            [[NSUserDefaults standardUserDefaults] setObject:[jsonDataUser objectForKey:@"membership_type"] forKey:@"membership_type"];
             [[NSUserDefaults standardUserDefaults] setObject:[jsonDataUser objectForKey:@"pending_balance"] forKey:@"pending_balance"];
 
-            
             [[NSUserDefaults standardUserDefaults] synchronize];
             
             //CHECK FOR PENDING BALANCE
@@ -2971,6 +3061,12 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
             testObject[@"last_name"] = [jsonDataUser objectForKey:@"last_name"];
             testObject[@"email"] = [jsonDataUser objectForKey:@"email"];
             testObject[@"username"] = [jsonDataUser objectForKey:@"username"];
+            if ([jsonDataUser objectForKey:@"membership_type"]) {
+                testObject[@"membership_type"] = [jsonDataUser objectForKey:@"membership_type"];
+            }
+            else{
+                testObject[@"membership_type"] = @"BASIC";
+            }
             testObject[@"balance"] = [jsonDataUser objectForKey:@"balance"];
             testObject[@"pending_balance"] = [jsonDataUser objectForKey:@"pending_balance"];
             testObject[@"third_party_id"] = [jsonDataUser objectForKey:@"third_party_id"];
@@ -2984,6 +3080,11 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
             
             //CHECK IF USER JUST SIGNED UP
             if(userJustSignedUp){
+                //PROMPT MEMBERSHIP
+                [self openUserMembership];
+                
+                
+                //SHOW REWARD POINTS
                 UIAlertView *alert ;
                 //CHECK IF REF BLANK
                 if([signUpTable.reference isEqualToString:@""]){
@@ -3315,6 +3416,9 @@ NSString *letters = @"abc4-32+defg-23-4hijk1lmn+o124p+2134+12eDaFaWXYZ0123456789
             
             //LOADING IMAGE
             [(ParseStarterProjectViewController*)myDelegate stopLoading];
+            
+            //UPDATE USER STATS
+            [self getUser];
         }
         else{
             //WORKED
@@ -3394,7 +3498,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
         [myDelegate startLoadingNow:@"Processing Payment"];
         
         //UPDATE USER DETAILS - 30secs
-        [NSTimer scheduledTimerWithTimeInterval:45.0
+        [NSTimer scheduledTimerWithTimeInterval:35.0
                                          target:self
                                        selector:@selector(getUser)
                                        userInfo:nil

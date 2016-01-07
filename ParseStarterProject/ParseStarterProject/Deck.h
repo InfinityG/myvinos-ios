@@ -6,11 +6,11 @@
 //  Copyright (c) 2012 Color Game App. All rights reserved.
 //
 
+#import "Deliver.h"
 #import <UIKit/UIKit.h>
-#import "FormTableControllerDeliver.h"
 
 
-@interface Deck : UIView<UIAlertViewDelegate,UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate>{
+@interface Deck : UIView<UIAlertViewDelegate,UIGestureRecognizerDelegate,UIScrollViewDelegate,UITextFieldDelegate>{
     
     BOOL deckOpen;
     NSMutableArray *cards;
@@ -52,14 +52,17 @@
     
     UIPanGestureRecognizer * panRecognizer;
     
-    FormTableControllerDeliver *deliverTable;
     
-    UIScrollView *deliverItemsScroll;
     
     id currentOpenCard;
+    
+   Deliver *deliver;
+
 
     
 }
+
+
 @property (strong, nonatomic) NSMutableArray *cards;
 
 @property (strong, nonatomic) UIView *boxHolder;
@@ -93,11 +96,11 @@
 
 @property (strong, nonatomic) UIPanGestureRecognizer * panRecognizer;
 
-@property (strong, nonatomic) FormTableControllerDeliver *deliverTable;
 
-@property (strong, nonatomic) UIScrollView *deliverItemsScroll;
 
 @property (strong, nonatomic) id currentOpenCard;
+
+@property (strong, nonatomic) Deliver *deliver;
 
 
 -(void)setLastLocation;
@@ -137,13 +140,9 @@
 
 -(void)updateDeliveryDeckTitle;
 
--(NSString*)getDelAddress;
 
--(NSString*)getDelNotes;
+-(BOOL)checkForLoggedInDeck;
 
--(void)setDelAddress:(NSString*)myadd;
-
--(void)forwardLocateMe;
 
 -(void)deliverNow;
 
@@ -155,10 +154,18 @@
 
 -(void)openCloseDeck;
 
--(void)addSubviewInForm:(id)myMap;
-
 -(void)forceCloseCardAndActiveDeck;
 
 -(NSString*)getDeckType;
+
+-(void)openCloseUserBuyDeck;
+-(void)updateUserMainStatsDeck;
+-(void)delieveryDeckSuccessDeck;
+
+-(void)startLoadingNowDeck:(NSString*)txt;
+
+-(void)stopLoadingDeck;
+
+-(void)openCloseUserDeck;
 
 @end

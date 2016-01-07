@@ -31,6 +31,7 @@
     UILabel *maxPriceTxt;
     
     UITapGestureRecognizer *bottleTap;
+    NSMutableArray *bottleGestures;
 }
 
 @property (strong, nonatomic) NSMutableDictionary *data;
@@ -41,6 +42,8 @@
 @property (strong, nonatomic) UILabel *title;
 @property (strong, nonatomic) UITextView *description;
 @property (strong, nonatomic) NSMutableArray *bottleIcons;
+@property (strong, nonatomic) NSMutableArray *bottleGestures;
+
 @property (strong, nonatomic) UILabel *bottleCounter;
 
 @property (strong, nonatomic) UILabel *price;

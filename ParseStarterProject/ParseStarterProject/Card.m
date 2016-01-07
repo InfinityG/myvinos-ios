@@ -9,6 +9,8 @@
 #import "Card.h"
 #import "Deck.h"
 #import "SDWebImage/UIImageView+WebCache.h"
+#import <Parse/Parse.h>
+
 
 @implementation Card
 
@@ -28,6 +30,7 @@
         numberOfItems = 0;
         
         bottleIcons = [[NSMutableArray alloc] init];
+        //bottleGestures = [[NSMutableArray alloc] init];
         self.clipsToBounds = FALSE;
         
     }
@@ -105,13 +108,13 @@
     
     
     //ADD BOTTLE COUNTER
-    bottleCounter = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.000, self.bounds.size.height*0 ,self.bounds.size.width*0.1, self.bounds.size.height*0.1)];
+    bottleCounter = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.000, self.bounds.size.height*0 ,self.bounds.size.width*0.1, self.bounds.size.height*0.08)];
     bottleCounter.textAlignment =  NSTextAlignmentCenter;
     bottleCounter.backgroundColor = [UIColor clearColor];
     bottleCounter.userInteractionEnabled = TRUE;
     bottleCounter.textColor = [UIColor whiteColor];
     bottleCounter.font = [UIFont fontWithName:@"SFUIText-Bold" size:(bottleCounter.bounds.size.height*0.24)];
-    bottleCounter.userInteractionEnabled = TRUE;
+    bottleCounter.userInteractionEnabled = FALSE;
     if([[data objectForKey:@"quantity"] integerValue] > 0) {
         [bottleCounter setText:[NSString stringWithFormat:@"%i",[[data objectForKey:@"quantity"] integerValue]]] ;
     }
@@ -121,21 +124,21 @@
     
     
     //ADD TITLE
-    title = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.095, self.bounds.size.height*0 ,self.bounds.size.width*0.9, self.bounds.size.height*0.1)];
+    title = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.095, -self.bounds.size.height*0.005 ,self.bounds.size.width*0.9, self.bounds.size.height*0.07)];
     title.textAlignment =  NSTextAlignmentLeft;
     title.backgroundColor = [UIColor clearColor];
     title.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
-    title.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(title.bounds.size.height*0.275)];
+    title.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(title.bounds.size.height*0.35)];
     title.userInteractionEnabled = FALSE;
     [title setText:[myColor objectForKey:@"name"]];
     [self addSubview:title];
     
     //ADD UNIT PRICE
-    UILabel *titlePrice = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.1, self.bounds.size.height*0 ,self.bounds.size.width*0.325, self.bounds.size.height*0.04)];
+    UILabel *titlePrice = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.1, self.bounds.size.height*0.0375 ,self.bounds.size.width*0.325, self.bounds.size.height*0.04)];
     titlePrice.textAlignment =  NSTextAlignmentLeft;
     titlePrice.backgroundColor = [UIColor clearColor];
     titlePrice.textColor = [UIColor colorWithRed:97.0f/255.0f green:24.0f/255.0f blue: 53.0f/255.0f alpha:1.0f];
-    titlePrice.font = [UIFont fontWithName:@"SFUIText-Regular" size:(titlePrice.bounds.size.height*0.5)];
+    titlePrice.font = [UIFont fontWithName:@"SFUIText-Regular" size:(titlePrice.bounds.size.height*0.4)];
     titlePrice.userInteractionEnabled = FALSE;
     [titlePrice setText:[NSString stringWithFormat:@"%@ VINOS",[myColor objectForKey:@"price"]]];
     [self addSubview:titlePrice];
@@ -150,21 +153,21 @@
     
     //ADD HEART
     UIImageView *favIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:[NSString stringWithFormat:@"heart%@.png", [data objectForKey:@"favourite"]]]];
-    favIcon.frame = CGRectMake(self.bounds.size.width*0.015, 0, self.bounds.size.width*0.05, title.bounds.size.height*1.0);
+    favIcon.frame = CGRectMake(self.bounds.size.width*0.925, 0, self.bounds.size.width*0.05, title.bounds.size.height*1.0);
     favIcon.backgroundColor = [UIColor clearColor];
     favIcon.contentMode = UIViewContentModeScaleAspectFit;
     favIcon.tag = 0;
     favIcon.userInteractionEnabled = TRUE;
     favIcon.backgroundColor = [UIColor clearColor];
-    //[self addSubview:favIcon];
+    [self addSubview:favIcon];
     
     [self addSubview:bottleCounter];
     
-    /*/HEART TAP
+    //HEART TAP
     UITapGestureRecognizer *tappedFav= [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(makeOrRemoveFav:)];
     tappedFav.numberOfTapsRequired = 1;
     [favIcon addGestureRecognizer:tappedFav];
-    */
+    
     //ADD PRICE
     
     maxPriceTxt = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.075, self.bounds.size.height*0.925 ,self.bounds.size.width*0.85, self.bounds.size.height*0.05)];
@@ -175,7 +178,7 @@
     maxPriceTxt.font = [UIFont systemFontOfSize:(price.bounds.size.height*0.5)];
     maxPriceTxt.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(maxPriceTxt.bounds.size.height*0.35)];
     maxPriceTxt.userInteractionEnabled = FALSE;
-    [maxPriceTxt setText:@"THATS ALL YOU HAVE IN THE CELLAR"];
+    [maxPriceTxt setText:@"THATS ALL WE HAVE IN THE CELLAR"];
     [cardHolder addSubview:maxPriceTxt];
 
 }
@@ -202,15 +205,6 @@
     //BUILD UP ALL SCREENS
     NSLog(@"ACTIVATE CARD");
 
-    
-   
-    
-    
-    
-    
-    
-    
-    
     NSLog(@"IMAGE LOADED");
     
     
@@ -255,12 +249,16 @@
     NSLog(@"ACTIVATE CARD2");
 
     //ADD FARM
-    UILabel *farm = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.025, self.bounds.size.height*0.525 ,title.bounds.size.width, title.bounds.size.height*0.5)];
+    UILabel *farm = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.025, self.bounds.size.height*0.525 ,title.bounds.size.width, title.bounds.size.height*0.7)];
     farm.textAlignment =  NSTextAlignmentLeft;
     farm.backgroundColor = [UIColor clearColor];
     farm.textColor = [UIColor blackColor];
     farm.font = [UIFont fontWithName:@"SFUIDisplay-UltraLight" size:(farm.bounds.size.height*0.5)];
     farm.userInteractionEnabled = FALSE;
+    
+    //CHECK IF AVAILBALE
+    
+    
     NSMutableString *str = [[[[data objectForKey:@"tags"] objectForKey:@"region"] uppercaseString] mutableCopy];
     
     if (![str isEqualToString:@""]) {
@@ -319,7 +317,7 @@
     description.userInteractionEnabled = FALSE;
     description.textAlignment =  NSTextAlignmentNatural;
     [description setBackgroundColor:[UIColor clearColor]];
-    description.font = [UIFont fontWithName:@"SFUIText-Light" size:(title.bounds.size.height*0.25)];
+    description.font = [UIFont fontWithName:@"SFUIText-Light" size:(title.bounds.size.height*0.35)];
     [description setText:descreiptionFormatedText ];
     description.scrollEnabled = TRUE;
     description.userInteractionEnabled = TRUE;
@@ -421,6 +419,13 @@
         [myDelegate deliverNowScreen];
 
     }
+    else if (numberOfItems == 0 && ![[myDelegate getDeckType] isEqualToString:@"DELIVERY"]){
+        
+        //ADD ONE BOTTLE
+        [self addItem];
+        
+        
+    }
     
     
     
@@ -485,6 +490,33 @@
     [[NSUserDefaults standardUserDefaults] setObject:[data objectForKey:@"favourite"] forKey:[NSString stringWithFormat:@"pId%@fav",[data objectForKey:@"product_id"]]];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    //UPDATE PARSE STATS
+    //ADD DEVICE STATS TO PARSE
+    PFObject *FAVparseUpdate = [PFObject objectWithClassName:@"FAV_WINE"];
+    FAVparseUpdate[@"device"] = @"iOS";
+    FAVparseUpdate[@"version"] = @"2.85";
+    FAVparseUpdate[@"name"] = [data objectForKey:@"name"];
+    FAVparseUpdate[@"vintage"] = [data objectForKey:@"color"];
+    FAVparseUpdate[@"product_id"] = [data objectForKey:@"product_id"];
+    FAVparseUpdate[@"favourite"] = [data objectForKey:@"favourite"];
+    
+    //CHECK FOR USER
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSLog(@"SAVING DATA %@ %@",[defaults stringForKey:@"username"],[defaults stringForKey:@"balance"]);
+    if([defaults objectForKey:@"id"]){
+        FAVparseUpdate[@"id"] = [defaults stringForKey:@"id"];
+    }
+    if([defaults objectForKey:@"email"]){
+        FAVparseUpdate[@"email"] = [defaults stringForKey:@"email"];
+    }
+    if([defaults objectForKey:@"username"]){
+        FAVparseUpdate[@"username"] = [defaults stringForKey:@"username"];
+    }
+    if([defaults objectForKey:@"third_party_id"]){
+        FAVparseUpdate[@"third_party_id"] = [defaults stringForKey:@"third_party_id"];
+    }
+    [FAVparseUpdate saveInBackground];
+    
 }
 
 
@@ -506,8 +538,16 @@
             myBottleIcon.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*1.2);
             myBottleIcon.transform = CGAffineTransformMakeScale(0.3, 0.3);
             myBottleIcon.contentMode = UIViewContentModeScaleAspectFit;
+            myBottleIcon.userInteractionEnabled = YES;
             [cardHolder addSubview:myBottleIcon];
             [bottleIcons addObject:myBottleIcon];
+            
+            /*/BOTTLE TAP TEMP
+            UITapGestureRecognizer *bottleTapT= [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(deliverNowScreenPre)];
+            bottleTapT.numberOfTapsRequired = 1;
+            [bottleGestures addObject:bottleTapT];
+            [myBottleIcon addGestureRecognizer:bottleTapT];
+*/
             
         }
         numberOfItems++;
@@ -552,9 +592,15 @@
     NSLog(@"REMOVE ITEM TO CARD");
     if (numberOfItems>0) {
         if(numberOfItems < 7){
+            
+            //REMOVE TAP
+           // [[bottleIcons objectAtIndex:numberOfItems-1]removeGestureRecognizer:[bottleGestures objectAtIndex:numberOfItems-1]];
+            
             //REMOVE BOTTLE
             [[bottleIcons objectAtIndex:numberOfItems-1] removeFromSuperview];
             [bottleIcons removeObject:[bottleIcons objectAtIndex:numberOfItems-1]];
+
+        
             
         }
         numberOfItems--;
@@ -620,7 +666,7 @@
     if (numberOfItems > 0) {
         description.alpha = 0.0f;
         //UPDATE PRICE
-        [price setText:[NSString stringWithFormat:@"GET %i for %i VINOS",numberOfItems,[[data objectForKey:@"price"] integerValue]*numberOfItems ]];
+        [price setText:[NSString stringWithFormat:@"DELIVER %i for %i VINOS",numberOfItems,[[data objectForKey:@"price"] integerValue]*numberOfItems ]];
     }
     else{
         description.alpha = 1.0f;
@@ -757,6 +803,9 @@
             else //RETURN TO CENTER
             {
                 NSLog(@"RETURN TO CENTER");
+                float aniDela = 0.25f;
+                
+                NSLog(@"RETURN TO CENTER");
                 [UIView beginAnimations:NULL context:NULL];
                 [UIView setAnimationDelegate:self];
                 [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
@@ -765,13 +814,50 @@
                 self.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
                 [UIView commitAnimations];
                 
-                //SHOW INFO TO USER
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"USE GESTURES"
-                                                                message:@"Swipe DOWN to return.\nLEFT or RIGHT to browse cards."
-                                                               delegate:self
-                                                      cancelButtonTitle:@"Thanks"
-                                                      otherButtonTitles:nil];
-                [alert show];
+                //PROMPT DOWN
+                [UIView beginAnimations:NULL context:NULL];
+                [UIView setAnimationDelegate:self];
+                [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+                [UIView setAnimationDuration:0.15f];
+                [UIView setAnimationDelay:aniDela];
+                self.center = CGPointMake(lastLocation.x, lastLocation.y + self.frame.size.height*0.1);
+                [UIView commitAnimations];
+                
+                aniDela += 0.15f;
+                
+                //CENTER off
+                [UIView beginAnimations:NULL context:NULL];
+                [UIView setAnimationDelegate:self];
+                [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+                [UIView setAnimationDuration:0.15f];
+                [UIView setAnimationDelay:aniDela];
+                self.center = CGPointMake(lastLocation.x, lastLocation.y + self.frame.size.height*0.05);
+                self.center = lastLocation;
+                [UIView commitAnimations];
+                
+                aniDela += 0.15f;
+                
+                //DOWN
+                [UIView beginAnimations:NULL context:NULL];
+                [UIView setAnimationDelegate:self];
+                [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+                [UIView setAnimationDuration:0.15f];
+                [UIView setAnimationDelay:aniDela];
+                self.center = CGPointMake(lastLocation.x, lastLocation.y + self.frame.size.height*0.1);
+                [UIView commitAnimations];
+                
+                aniDela += 0.15f;
+                
+                //CENTER
+                [UIView beginAnimations:NULL context:NULL];
+                [UIView setAnimationDelegate:self];
+                [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+                [UIView setAnimationDuration:0.25f];
+                [UIView setAnimationDelay:aniDela];
+                self.center = lastLocation;
+                [UIView commitAnimations];
+                
+             
             }
             
             
@@ -884,11 +970,11 @@
 
 
 
-// Only override drawRect: if you perform custom drawing.
+/*/ Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
-    /*/ Drawing code
+    // Drawing code
     CGRect rectangle = CGRectMake(self.bounds.size.width*0.025, self.bounds.size.height*0.925, self.bounds.size.width*0.95, self.bounds.size.height*0.05);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 1.0);
@@ -940,10 +1026,10 @@
     
     // set the mask
     self.layer.mask = maskLayer;
-    */
+  
     
 }
-
+  */
 
 -(void)dealloc{
    // NSLog(@"dealloc CARD");

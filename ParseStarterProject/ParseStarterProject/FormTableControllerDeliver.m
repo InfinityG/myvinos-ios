@@ -4,7 +4,9 @@
 //
 //  Created by Andrew Lim on 4/15/11.
 #import "FormTableControllerDeliver.h"
-#import <Deliver.h>
+#import "Deliver.h"
+#import <QuartzCore/QuartzCore.h>
+
 
 @implementation FormTableControllerDeliver
 @synthesize name = name_ ;
@@ -39,12 +41,12 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return self.view.bounds.size.height/9;
+    return ((Deliver*)myDelegate).frame.size.height/13;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
   // Return the number of rows in the section.
-  return 8;
+  return 7;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
@@ -63,119 +65,112 @@
 	UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil] ;
 
     // Make cell unselectable
-	cell.selectionStyle = UITableViewCellSelectionStyleNone;
+	cell.selectionStyle = UITableViewCellSelectionStyleBlue;
     cell.backgroundColor = [UIColor clearColor];
 	
 	UITextField* tf = nil ;	
 	switch ( indexPath.row ) {
         
         case 0: {
-            UILabel *memberTitle = [[UILabel alloc] initWithFrame:CGRectMake(cell.bounds.size.width*0.05, 0 ,cell.bounds.size.width*0.9, cell.bounds.size.height)];
+            UILabel *memberTitle = [[UILabel alloc] initWithFrame:CGRectMake(cell.bounds.size.width*0.05, 0 ,cell.bounds.size.width*0.95, cell.bounds.size.height)];
             memberTitle.textAlignment =  NSTextAlignmentLeft;
             memberTitle.backgroundColor = [UIColor clearColor];
-            memberTitle.textColor = [UIColor whiteColor];
-            memberTitle.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(memberTitle.bounds.size.height*0.3)];
-            memberTitle.userInteractionEnabled = FALSE;
-            [memberTitle setText:@"Deliver To:"];
-            [cell addSubview:memberTitle];
-            break ;
-        }
-        case 1: {
-            if([[NSUserDefaults standardUserDefaults] objectForKey:@"first_name"]!=nil){
-                self.name = [NSString stringWithFormat:@"%@ %@",[[NSUserDefaults standardUserDefaults] stringForKey:@"first_name"],[[NSUserDefaults standardUserDefaults] stringForKey:@"last_name"]];
-            }
-            tf = nameField_ = [self makeTextField:self.name placeholder:@"Recipient Name"];
-            tf.autocapitalizationType = UITextAutocapitalizationTypeWords;
-            [cell addSubview:nameField_];
-            break ;
-        }
-        case 2: {
-            UILabel *memberTitle = [[UILabel alloc] initWithFrame:CGRectMake(cell.bounds.size.width*0.05, 0 ,cell.bounds.size.width*0.9, cell.bounds.size.height)];
-            memberTitle.textAlignment =  NSTextAlignmentLeft;
-            memberTitle.backgroundColor = [UIColor clearColor];
-            memberTitle.textColor = [UIColor whiteColor];
-            memberTitle.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(memberTitle.bounds.size.height*0.3)];
-            memberTitle.userInteractionEnabled = FALSE;
-            [memberTitle setText:@"Address:"];
-            [cell addSubview:memberTitle];
-            break ;
-        }
-        case 3: {
-            tf = addressField_ = [self makeTextField:self.address placeholder:@"Delivery Address"];
-            tf.autocapitalizationType = UITextAutocapitalizationTypeWords;
-            [cell addSubview:addressField_];
-            break ;
-        }
-        case 4: {
-            UILabel *memberTitle = [[UILabel alloc] initWithFrame:CGRectMake(cell.bounds.size.width*0.05, 0 ,cell.bounds.size.width*0.9, cell.bounds.size.height)];
-            memberTitle.textAlignment =  NSTextAlignmentLeft;
-            memberTitle.backgroundColor = [UIColor clearColor];
-            memberTitle.textColor = [UIColor whiteColor];
-            memberTitle.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(memberTitle.bounds.size.height*0.3)];
-            memberTitle.userInteractionEnabled = FALSE;
-            [memberTitle setText:@"Notes for the Driver:"];
-            [cell addSubview:memberTitle];
-            break ;
-        }
-        case 5: {
-            tf = notesField_ = [self makeTextField:self.notes placeholder:@"Details or instructions"];
-            tf.returnKeyType = UIReturnKeyDone;
-            tf.autocorrectionType = UITextAutocorrectionTypeYes ;
-            tf.autocapitalizationType = UITextAutocapitalizationTypeNone;
-            tf.adjustsFontSizeToFitWidth = YES;
-
-            [cell addSubview:notesField_];
-            break ;
-        }
-        case 6: {
-            UILabel *memberTitle = [[UILabel alloc] initWithFrame:CGRectMake(cell.bounds.size.width*0.05, 0 ,cell.bounds.size.width*0.9, cell.bounds.size.height)];
-            memberTitle.textAlignment =  NSTextAlignmentCenter;
-            memberTitle.backgroundColor = [UIColor clearColor];
-            memberTitle.textColor = [UIColor whiteColor];
-            memberTitle.font = [UIFont fontWithName:@"SFUIText-Regular" size:(memberTitle.bounds.size.height*0.15)];
-            memberTitle.userInteractionEnabled = FALSE;
-            [memberTitle setText:@"Use your VINOS and confirm your on-demand delivery?"];
-            [cell addSubview:memberTitle];
-            break ;
-        }
-        case 7: {
-            //CANCEL BUTTON
-            UIButton *loginBut = [UIButton buttonWithType:UIButtonTypeCustom];
-            loginBut.frame = CGRectMake(cell.bounds.size.width*0.0,0,cell.bounds.size.width*0.5,cell.bounds.size.height);
-            loginBut.backgroundColor = [UIColor clearColor];
-            [loginBut setTitle:@"BOTTLES" forState:UIControlStateNormal];
-            [loginBut setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            loginBut.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(loginBut.bounds.size.height*0.4)];
-            [loginBut addTarget:myDelegate action:@selector(activateDeck) forControlEvents:UIControlEventTouchUpInside];
-            loginBut.alpha = 1;
-            [cell addSubview:loginBut];
+            memberTitle.textColor = [UIColor lightGrayColor];
             
-            //SIGN UP BUTTON
-            UIButton *signUpBut = [UIButton buttonWithType:UIButtonTypeCustom];
-            signUpBut.frame = CGRectMake(cell.bounds.size.width*0.5,0,cell.bounds.size.width*0.5,cell.bounds.size.height);
-            signUpBut.backgroundColor = [UIColor clearColor];
-            [signUpBut setTitle:@"DELIVER NOW" forState:UIControlStateNormal];
-            [signUpBut setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            signUpBut.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(signUpBut.bounds.size.height*0.4)];
-            [signUpBut addTarget:myDelegate action:@selector(deliverNow) forControlEvents:UIControlEventTouchUpInside];
-            signUpBut.alpha = 1;
-            [cell addSubview:signUpBut];
-            
+            memberTitle.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(memberTitle.frame.size.height*0.5)];
+            memberTitle.userInteractionEnabled = FALSE;
+            [memberTitle setText:@"ENTER YOUR DELIVERY DETAILS"];
+            [cell addSubview:memberTitle];
             
             break ;
         }
         
+        case 1: {
+            
+            if([[NSUserDefaults standardUserDefaults] objectForKey:@"first_name"]!=nil){
+                self.name = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"first_name"]];
+            }
+            tf = nameField_ = [self makeTextField:self.name placeholder:@"Recipient Name"];
+            tf.autocapitalizationType = UITextAutocapitalizationTypeWords;
+            [cell addSubview:nameField_];
+            
+            
+            
+            break ;
+        }
+            
+        case 2: {
+            
+            
+            tf = addressField_ = [self makeTextField:self.address placeholder:@"ENTER ADDRESS"];
+            tf.autocapitalizationType = UITextAutocapitalizationTypeWords;
+            tf.adjustsFontSizeToFitWidth = YES;
+            [cell addSubview:addressField_];
+            
+            break ;
+        }
+        
+        case 3: {
+            
+            tf = notesField_ = [self makeTextField:self.notes placeholder:@"DELIVERY DETAILS"];
+            tf.returnKeyType = UIReturnKeyDone;
+            tf.autocorrectionType = UITextAutocorrectionTypeYes ;
+            tf.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+            tf.adjustsFontSizeToFitWidth = NO;
+            
+            [cell addSubview:notesField_];
+            
+         
+            break ;
+        }
+            
+        case 5: {
+           
+            //CANCEL BUTTON
+            UIButton *loginBut = [UIButton buttonWithType:UIButtonTypeCustom];
+            loginBut.frame = CGRectMake(0,0,cell.bounds.size.width*0.4,cell.bounds.size.height*0.8);
+            loginBut.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
+            [loginBut setTitle:@"ITEMS" forState:UIControlStateNormal];
+            [loginBut setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            loginBut.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(loginBut.bounds.size.height*0.4)];
+            [loginBut addTarget:myDelegate action:@selector(activateDeckDeliver) forControlEvents:UIControlEventTouchUpInside];
+            loginBut.alpha = 1;
+            loginBut.layer.cornerRadius = 6;
+            loginBut.layer.borderWidth = 1;
+            loginBut.layer.borderColor = [UIColor whiteColor].CGColor;
+            [cell addSubview:loginBut];
+            
+            //SIGN UP BUTTON
+            UIButton *signUpBut = [UIButton buttonWithType:UIButtonTypeCustom];
+            signUpBut.frame = CGRectMake(cell.bounds.size.width*0.5,0,cell.bounds.size.width*0.4,cell.bounds.size.height*0.8);
+            signUpBut.backgroundColor = [UIColor whiteColor];
+            [signUpBut setTitle:@"CONFIRM" forState:UIControlStateNormal];
+            [signUpBut setTitleColor:[UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
+            signUpBut.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(signUpBut.bounds.size.height*0.4)];
+            [signUpBut addTarget:myDelegate action:@selector(makeDelivery) forControlEvents:UIControlEventTouchUpInside];
+            signUpBut.alpha = 1;
+            signUpBut.layer.cornerRadius = 6;
+
+            [cell addSubview:signUpBut];
+            
+
+            
+            break ;
+        }
+            
 	}
 
 	// Textfield dimensions
-	tf.frame = CGRectMake(self.view.bounds.size.width*0.05, cell.bounds.size.height*0.15, self.view.bounds.size.width*0.9, cell.bounds.size.height*0.7);
+	tf.frame = CGRectMake(self.view.bounds.size.width*0.025, cell.bounds.size.height*0.0, self.view.bounds.size.width*0.95, cell.bounds.size.height);
     tf.tag = indexPath.row;
     tf.layer.cornerRadius = 5;
     tf.textAlignment = NSTextAlignmentLeft;
-    tf.backgroundColor = [UIColor whiteColor];
-    tf.textColor = [UIColor blackColor];
-    tf.font = [UIFont fontWithName:@"SFUIDisplay-Light" size:(tf.bounds.size.height*0.8)];
+    tf.textColor = [UIColor whiteColor];
+    tf.font = [UIFont fontWithName:@"SFUIDisplay-Light" size:(tf.bounds.size.height*0.5)];
 
+    cell.backgroundColor = [UIColor clearColor];
+    
+    
 	// Workaround to dismiss keyboard when Done/Return is tapped
 	[tf addTarget:self action:@selector(textFieldFinished:) forControlEvents:UIControlEventEditingDidEndOnExit];	
 	
@@ -187,6 +182,8 @@
 
 #pragma mark -
 #pragma mark Table view delegate
+
+
 
 #pragma mark -
 #pragma mark Memory management
@@ -241,7 +238,7 @@
 		self.name = textField.text ;
     } else if ( textField == addressField_ ) {
         self.address = textField.text ;
-        [(Deck*)myDelegate forwardLocateMe];
+        [myDelegate updateAdFromForm:textField.text];
     } else if ( textField == notesField_ ) {
         self.notes = textField.text ;
     }
@@ -291,6 +288,17 @@
     */
      [textField resignFirstResponder];
     return NO; // We do not want UITextField to insert line-breaks.
+}
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    if ( textField == addressField_ ) {
+        if (textField.text.length > 0) {
+            textField.text = @"";
+             self.address = @"" ;
+        }
+       
+    }
+    return YES;
 }
 
 -(void)removeAllTextFields{

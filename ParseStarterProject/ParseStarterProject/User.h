@@ -116,6 +116,8 @@
     NSMutableDictionary *membershipToBuyDict;
      UIView *membershipInfoView;
     
+    UIView *bkLayer;
+    
 }
 @property (retain, nonatomic) FormTableController *signUpTable;
 @property (retain, nonatomic) FormTableControllerLogIn *logInTable;
@@ -212,6 +214,7 @@
 @property (strong, nonatomic) NSMutableArray *membershipButs;
 @property (strong, nonatomic)  NSMutableDictionary *membershipToBuyDict;
 @property (strong, nonatomic) UIView *membershipInfoView;
+@property (strong, nonatomic) UIView *bkLayer;
 
 -(void)setData:(NSDictionary*)myUser;
 

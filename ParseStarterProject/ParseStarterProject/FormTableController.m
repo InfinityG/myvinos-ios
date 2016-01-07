@@ -106,7 +106,7 @@
             //cell.textLabel.text = @"email" ;
             tf = mobileField_ = [self makeTextField:self.mobile placeholder:@"Mobile (+27831234567)"];
             tf.keyboardType = UIKeyboardTypePhonePad;
-            [myLabel setText:@"Use the international format. ie. +27 83 123 4567"];
+            [myLabel setText:@"Use the international format. ie. +27831234567"];
             [cell addSubview:mobileField_];
             break ;
         }
@@ -122,7 +122,7 @@
             //cell.textLabel.text = @"Password" ;
             tf = passwordField_ = [self makeTextField:self.password placeholder:@"1Passw0rd!"];
             tf.returnKeyType = UIReturnKeyNext;
-            [myLabel setText:@"Secure password containing letters, numbers and uppercase."];
+            [myLabel setText:@"Secure password containing more than six characters."];
             [cell addSubview:passwordField_];
             break ;
         }
@@ -141,7 +141,7 @@
             UIButton *loginBut = [UIButton buttonWithType:UIButtonTypeCustom];
             loginBut.frame = CGRectMake(cell.bounds.size.width*0.2,0,cell.bounds.size.width*0.3,cell.bounds.size.height);
             loginBut.backgroundColor = [UIColor clearColor];
-            [loginBut setTitle:@"CANCEL" forState:UIControlStateNormal];
+            [loginBut setTitle:@"Back" forState:UIControlStateNormal];
             [loginBut setTitleColor:[UIColor colorWithRed:110.0f/255.0f green:0.0f/255.0f blue: 30.0f/255.0f alpha:1.0f] forState:UIControlStateNormal];
             loginBut.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(loginBut.bounds.size.height*0.4)];
             [loginBut addTarget:myDelegate action:@selector(closeForms) forControlEvents:UIControlEventTouchUpInside];

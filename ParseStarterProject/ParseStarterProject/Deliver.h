@@ -7,13 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Deck.h"
 #import <MapKit/MapKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "FormTableControllerDeliver.h"
 
 
-
-@interface Deliver : UIView <MKMapViewDelegate,CLLocationManagerDelegate,UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate,UITextFieldDelegate>{
+@interface Deliver : UIView <MKMapViewDelegate,CLLocationManagerDelegate,UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate,UITextFieldDelegate,UIScrollViewDelegate>{
     
     NSMutableArray *topUps;
 
@@ -51,6 +50,11 @@
     UIButton *deliverButtonInside;
     
     CLLocation *deliveryLocation;
+    
+     FormTableControllerDeliver *deliverTable;
+    UIScrollView *deliverItemsScroll;
+    
+    
 }
 
 @property (retain, nonatomic)NSMutableArray *topUps;
@@ -83,16 +87,33 @@
 @property (strong, nonatomic) UIButton *deliverButtonInside;
 
 @property (nonatomic, retain) CLLocation *deliveryLocation;
+@property (strong, nonatomic) FormTableControllerDeliver *deliverTable;
+
+@property (strong, nonatomic) UIScrollView *deliverItemsScroll;
 
 
+
+-(void)updateAdFromForm:(NSString *)txt;
+
+-(void)updateCurrentLocation;
 
 -(void)makeDelivery;
 -(BOOL)hasItems;
 -(void)closeDelivery;
 
--(void)hideCardView;
--(void)showCardView;
-
 -(void)forwardLocate;
+
+-(void)updateScrollItems;
+
+-(NSString*)getDelAddress;
+
+-(NSString*)getDelNotes;
+
+-(void)setDelAddress:(NSString*)myadd;
+
+- (id)initWithFrame:(CGRect)frame sMyDelegate:(id)myDel;
+
+-(void)activateDeckDeliver;
+
 
 @end

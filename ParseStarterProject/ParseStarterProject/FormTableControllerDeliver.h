@@ -35,4 +35,5 @@
 -(void)removeAllTextFields;
 -(void)setAddressDirect:(NSString *)address;
 
+
 @end

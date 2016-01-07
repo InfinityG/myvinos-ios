@@ -6,12 +6,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ParseStarterProjectViewController : UIViewController <UIGestureRecognizerDelegate,UIAlertViewDelegate >
+@interface ParseStarterProjectViewController : UIViewController <UIGestureRecognizerDelegate,UIAlertViewDelegate>
 
--(void)showQuestion;
 
 -(void)openDeck:(id)myDeck;
--(void)closeDeck:(id)myDeck;
 - (void) showSelectionScreen;
 
 -(void)fullScreenCard;
@@ -24,15 +22,9 @@
 -(void)updateUserMainStats;
 
 - (void)openCloseUser;
--(id)getDeliveryData;
 
 -(void)startLoadingNow:(NSString*)lStatus;
 -(void)stopLoading;
-
--(NSString*)getDeliveryAddress;
--(void)setDeliveryAddress:(NSString*)myAdd;
-
--(NSString*)getDeliveryNotes;
 
 -(void)forwardLoc;
 
@@ -44,7 +36,7 @@
 
 -(void)activateDeliveryDeck;
 
--(void)openDeliveryCard;
+-(void)updateMapGPS;
 
 -(void)showDeliverScreen;
 

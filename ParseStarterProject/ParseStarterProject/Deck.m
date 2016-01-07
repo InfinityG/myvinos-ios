@@ -9,10 +9,13 @@
 #include <math.h>
 #import "UIImageView+WebCache.h"
 
+#import "Deliver.h"
 #import "Deck.h"
 #import "Card.h"
 #import "ParseStarterProjectViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import <Parse/Parse.h>
+
 
 #define   DEGREES_TO_RADIANS(degrees)  ((3.14159265359 * degrees)/ 180)
 #define STARTPOINT self.bounds.size.height*0.1
@@ -27,7 +30,7 @@
 
 @synthesize data,myDelegate,cards,boxHolder,colorFilter,moodFilter,title,type,blackCard,scrollView,imageUrl,description,backCard;
 
-@synthesize filterTxt,deckBut,filterBut,deliverTable,deliverItemsScroll,currentOpenCard,fakeBoxHolder;
+@synthesize filterTxt,deckBut,filterBut,currentOpenCard,fakeBoxHolder;
 
 - (id)initWithFrame:(CGRect)frame setTitle:(NSString*)myTitle setImageUrl:(NSString*)imageUrlT setImageDes:(NSString*)imageDesT setType:(NSString*)myType
 {
@@ -37,6 +40,7 @@
         NSLog(@"HELLO DECK %@",myTitle);
         
         self.backgroundColor = [UIColor clearColor];
+        self.exclusiveTouch = YES;
         /*
         CAGradientLayer *gradient = [CAGradientLayer layer];
         gradient.frame = self.bounds;
@@ -60,6 +64,8 @@
         type = myType;
         imageUrl = imageUrlT;
         description = imageDesT;
+        
+        
         //BLACK CARD
         [self buildBlackCard];
         
@@ -95,42 +101,48 @@
     }
     blackCard.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
     blackCard.clipsToBounds = FALSE;
-    //blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
+    blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.4);
     blackCard.layer.cornerRadius = 10;
-    //blackCard.layer.shadowColor = [UIColor blackColor].CGColor;
-    //blackCard.layer.shadowOffset = CGSizeMake(0, 0);
-    //blackCard.layer.shadowOpacity = 0.75f;
-    // blackCard.layer.shadowRadius = 10.0;
-    UILabel* filterTxtLabel;
+    blackCard.layer.shadowColor = [UIColor blackColor].CGColor;
+    blackCard.layer.shadowOffset = CGSizeMake(0, 0);
+    blackCard.layer.shadowOpacity = 0.75f;
+    blackCard.layer.shadowRadius = 10.0;
+    //UILabel* filterTxtLabel;
     //DELIVERY INSTRUCTION
     if([type isEqualToString:@"DELIVERY"]){
-       filterTxtLabel = [[UILabel alloc] initWithFrame:CGRectMake(blackCard.bounds.size.width*0.05, blackCard.bounds.size.height*0 ,blackCard.bounds.size.width*0.9, self.bounds.size.height*0.06)];
+       // blackCard.backgroundColor = [UIColor whiteColor];
+        
+        /*
+        filterTxtLabel = [[UILabel alloc] initWithFrame:CGRectMake(blackCard.bounds.size.width*0.05, blackCard.bounds.size.height*0 ,blackCard.bounds.size.width*0.9, self.bounds.size.height*0.06)];
         filterTxtLabel.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(filterTxtLabel.bounds.size.height*0.7)];
         filterTxtLabel.textAlignment =  NSTextAlignmentCenter;
         filterTxtLabel.backgroundColor = [UIColor clearColor];
-        filterTxtLabel.textColor = [UIColor whiteColor];
+        filterTxtLabel.textColor = [UIColor blackColor];
         filterTxtLabel.userInteractionEnabled = TRUE;
         filterTxtLabel.alpha = 1;
         [filterTxtLabel setText:@"DELIVER NOW"];
         [blackCard addSubview:filterTxtLabel];
-        
+        */
     }
     
-    //ADD TOUCH TO OPEN
+    /*/ADD TOUCH TO OPEN
     UITapGestureRecognizer *tapped223 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showBlackCard)];
     tapped223.numberOfTapsRequired = 1;
     [filterTxtLabel addGestureRecognizer:tapped223];
-    
+    */
     
     filterTxt = [[UILabel alloc] initWithFrame:CGRectMake(blackCard.bounds.size.width*0.025, blackCard.bounds.size.height*0 ,blackCard.bounds.size.width*0.95, FILTERTEXTHEIGHT)];
     filterTxt.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(filterTxt.bounds.size.height*0.35)];
+    filterTxt.textColor = [UIColor whiteColor];
     if([type isEqualToString:@"DELIVERY"]){
-        filterTxt.frame = CGRectMake(blackCard.bounds.size.width*0.025, blackCard.bounds.size.height*0.06 ,blackCard.bounds.size.width*0.9, self.bounds.size.height*0.04);
-        filterTxt.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(filterTxt.bounds.size.height*0.8)];
+       // filterTxt.textColor = [UIColor blackColor];
+        //filterTxt.frame = CGRectMake(blackCard.bounds.size.width*0.025, blackCard.bounds.size.height*0.06 ,blackCard.bounds.size.width*0.9, self.bounds.size.height*0.04);
+        //filterTxt.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(filterTxt.bounds.size.height*0.4)];
+        //filterTxt.textColor = [UIColor blackColor];
+
     }
     filterTxt.textAlignment =  NSTextAlignmentCenter;
     filterTxt.backgroundColor = [UIColor clearColor];
-    filterTxt.textColor = [UIColor whiteColor];
     filterTxt.userInteractionEnabled = TRUE;
     filterTxt.alpha = 1;
     [filterTxt setText:title];
@@ -154,7 +166,7 @@
     [blackCard addSubview:promptText];
     */
     
-    //PROMPT BUTTON
+    /*/PROMPT BUTTON
     //ADD WINE COLOR
     UIImageView *promptBut = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"vinosButMore.png" ]];
     promptBut.frame = CGRectMake(self.bounds.size.width*0.9, filterTxt.bounds.origin.y, self.bounds.size.width*0.075, filterTxt.bounds.size.height);
@@ -162,7 +174,7 @@
     promptBut.contentMode = UIViewContentModeScaleAspectFit;
     promptBut.userInteractionEnabled = FALSE;
     [blackCard addSubview:promptBut];
-    
+    */
     
     if(![type isEqualToString:@"DELIVERY"]){
         
@@ -186,7 +198,7 @@
         //ADD TEXT BOX
         //NSString *descreiptionFormatedText = [[[NSAttributedString alloc] initWithData:[[data objectForKey:@"description"] dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: [NSNumber numberWithInt:NSUTF8StringEncoding]} documentAttributes:nil error:nil] string];
         
-        UITextView *descriptionBlackCard = [[UITextView alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.025, self.bounds.size.height*0.615 ,self.bounds.size.width*0.95, self.bounds.size.height*0.325)];
+        UITextView *descriptionBlackCard = [[UITextView alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.025, self.bounds.size.height*0.515 ,self.bounds.size.width*0.95, self.bounds.size.height*0.325)];
         descriptionBlackCard.userInteractionEnabled = FALSE;
         descriptionBlackCard.textAlignment =  NSTextAlignmentNatural;
         descriptionBlackCard.textColor = [UIColor whiteColor];
@@ -211,27 +223,18 @@
         [blackCard addSubview:butShowBack];
          */
         
-        //FILTER BUT
-       UIButton *shuffleBut = [UIButton buttonWithType:UIButtonTypeCustom];
-        shuffleBut.frame = CGRectMake(self.bounds.size.width*0.45, self.bounds.size.height*0.875  ,self.bounds.size.width*0.1, self.bounds.size.height*0.075);
-        [shuffleBut setBackgroundImage:[[UIImage imageNamed:@"deckBut.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0.0] forState:UIControlStateNormal];
-        [shuffleBut addTarget:self action:@selector(showBackCard) forControlEvents:UIControlEventTouchUpInside];
-        [blackCard addSubview:shuffleBut];
         
-        //SHUFFEL PROMPT
-        UILabel *filterPrompt = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.2, self.bounds.size.height*0.95  ,self.bounds.size.width*0.6, self.bounds.size.height*0.05)];
-        filterPrompt.backgroundColor = [UIColor clearColor];
-        filterPrompt.alpha = 0.5f;
-        filterPrompt.textAlignment =  NSTextAlignmentCenter;
-        filterPrompt.textColor = [UIColor whiteColor];
-        filterPrompt.font = [UIFont fontWithName:@"SFUIText-Regular" size:(filterPrompt.bounds.size.height*0.5)];
-        filterPrompt.userInteractionEnabled = FALSE;
-        [filterPrompt setText:@"FILTER BY MOOD"];
-        [blackCard addSubview:filterPrompt];
     }
     else{
         //IS DELIVERY
         
+        //SET UP DELIVERY VIEW AND DELIVERY DECK
+        deliver = [[Deliver alloc] initWithFrame:CGRectMake(blackCard.bounds.size.width*0.05, blackCard.bounds.size.height*0.1 ,blackCard.bounds.size.width*0.9, blackCard.bounds.size.height*0.9) sMyDelegate:self];
+        deliver.alpha = 1.0f;
+        deliver.myDelegate = self;
+        [blackCard addSubview:deliver];
+    
+       
         
         //ONLY WHERE MAP VIEW GOES
     }
@@ -240,88 +243,22 @@
     
 }
 
--(void)addSubviewInForm:(id)myMap{
-    [blackCard addSubview:myMap];
+
+-(void)openCloseUserBuyDeck{
+    [myDelegate openCloseUserBuy];
 }
 
--(void)updateScrollItems{
-    NSLog(@"\n\nUPDATE SCROLL ITEMS - %@",@"START");
-    
-    
-    
-    //REMOVE ALL VIEWS OF SCROLL
-    for (UIView *view in [deliverItemsScroll subviews])
-    {
-        [view removeFromSuperview];
-    }
-    
-    
-    
-    //ADD TO VIEW
-    int i = 0;
-    CGFloat barHeight = self.frame.size.height*0.05;
-    
-    for (NSDictionary *dictionary in data) {
-        //NSLog(@"\n\nPRODUCT FOUND - %@",dictionary);
-        //BUILD HISTORY SCROLL
-        
-        //ADD TO SCROLL VIEW AND ADD
-        CGFloat y = i * barHeight;
-        
-        
-        
-        UILabel *hist0 = [[UILabel alloc] initWithFrame:CGRectMake(0, y ,deliverItemsScroll.bounds.size.width * 0.1, barHeight)];
-        hist0.textAlignment =  NSTextAlignmentCenter;
-        hist0.backgroundColor = [UIColor clearColor];
-        hist0.textColor = [UIColor whiteColor];
-        hist0.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(hist0.bounds.size.height*0.3)];
-        hist0.userInteractionEnabled = FALSE;
-        [hist0 setText:[dictionary objectForKey:@"quantity"]];
-        [deliverItemsScroll addSubview:hist0];
-        
-        
-        //ADD TO SCROLL VIEW AND ADD
-        UILabel *hist1 = [[UILabel alloc] initWithFrame:CGRectMake( deliverItemsScroll.bounds.size.width*0.1 , y ,deliverItemsScroll.bounds.size.width*0.65, barHeight)];
-        hist1.textAlignment =  NSTextAlignmentLeft;
-        hist1.backgroundColor = [UIColor clearColor];
-        hist1.textColor = [UIColor whiteColor];
-        hist1.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(hist1.bounds.size.height*0.55)];
-        hist1.userInteractionEnabled = FALSE;
-        [hist1 setText:[dictionary objectForKey:@"name"]];
-        [deliverItemsScroll addSubview:hist1];
-        
-        
-        //ADD TO SCROLL VIEW AND ADD
-        UILabel *hist2 = [[UILabel alloc] initWithFrame:CGRectMake( deliverItemsScroll.bounds.size.width*0.75, y ,deliverItemsScroll.bounds.size.width*0.25, barHeight)];
-        hist2.textAlignment =  NSTextAlignmentRight;
-        hist2.backgroundColor = [UIColor clearColor];
-        hist2.textColor = [UIColor whiteColor];
-        hist2.font = [UIFont fontWithName:@"SFUIDisplay-Regular" size:(hist2.bounds.size.height*0.25)];
-        hist2.userInteractionEnabled = FALSE;
-        [hist2 setText:[NSString stringWithFormat:@"%i V",[[dictionary objectForKey:@"quantity"] integerValue]*[[dictionary objectForKey:@"price"] integerValue]]];
-        [deliverItemsScroll addSubview:hist2];
-        
-        
-        
-        i++;
-        
-    }
-    CGFloat y = i * barHeight;
+-(void)delieveryDeckSuccessDeck{
+    [myDelegate delieveryDeckSuccess];
 
-    //ADD TOTAL
-    UILabel *hist1 = [[UILabel alloc] initWithFrame:CGRectMake( deliverItemsScroll.bounds.size.width*0.1 , y ,deliverItemsScroll.bounds.size.width*0.9, barHeight)];
-    hist1.textAlignment =  NSTextAlignmentRight;
-    hist1.backgroundColor = [UIColor clearColor];
-    hist1.textColor = [UIColor whiteColor];
-    hist1.font = [UIFont fontWithName:@"SFUIDisplay-Bold" size:(hist1.bounds.size.height*0.75)];
-    hist1.userInteractionEnabled = FALSE;
-    [hist1 setText:[NSString stringWithFormat:@"TOTAL: %i VINOS",[self getOrderPrice]]];
-    [deliverItemsScroll addSubview:hist1];
-    
-    
-    deliverItemsScroll.contentSize = CGSizeMake(deliverItemsScroll.frame.size.width, barHeight *(i+1));
-    
-    
+}
+
+-(BOOL)checkForLoggedInDeck{
+    return [myDelegate checkForLoggedIn];
+}
+
+-(void)startLoadingNowDeck:(NSString*)txt{
+    [myDelegate startLoadingNow:txt];
 }
 
 -(void)showBackCard{
@@ -338,22 +275,7 @@
     
 }
 
--(NSString*)getDelAddress{
-    return deliverTable.address;
-}
 
--(NSString*)getDelNotes{
-    return [NSString stringWithFormat:@"%@ - %@",deliverTable.name,deliverTable.notes];
-}
-
--(void)setDelAddress:(NSString*)myadd{
-    deliverTable.address = myadd;
-    [deliverTable setAddressDirect:myadd];
-}
-
--(void)forwardLocateMe{
-    [myDelegate forwardLoc];
-}
 
 -(void)deliverNow{
     
@@ -373,7 +295,7 @@
     [myDelegate showSelectionScreen];
 
     //OPEN DELIVERY SCREEN
-    [myDelegate showDeliverScreenStraight];
+    [myDelegate showDeliverScreen];
     
     
 
@@ -390,35 +312,20 @@
     backCard.clipsToBounds = FALSE;
     backCard.alpha = 0;
     backCard.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
-    //blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
-    backCard.layer.cornerRadius = 10;
-    //blackCard.layer.shadowColor = [UIColor blackColor].CGColor;
-    //blackCard.layer.shadowOffset = CGSizeMake(0, 0);
+    blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.4);
+    //backCard.layer.cornerRadius = 10;
+   // backCard.layer.shadowColor = [UIColor blackColor].CGColor;
+   // backCard.layer.shadowOffset = CGSizeMake(0, 0);
     //blackCard.layer.shadowOpacity = 0.75f;
-    // blackCard.layer.shadowRadius = 10.0;
+   // backCard.layer.shadowRadius = 10.0;
     
     
     if ([type isEqualToString:@"DELIVERY"]) {
 
         //IS DELIVERY
-        //ADD FORM
-        deliverTable = [[FormTableControllerDeliver alloc ]initWithStyle: UITableViewStyleGrouped];
-        deliverTable.myDelegate = self;
-        deliverTable.view.alpha = 1.0f;
-        deliverTable.view.backgroundColor = [UIColor clearColor];
-        deliverTable.view.frame = CGRectMake(blackCard.bounds.size.width*0.0,blackCard.bounds.size.height*0.5,blackCard.bounds.size.width*1.0,blackCard.bounds.size.height*0.5);
-        deliverTable.view.backgroundColor = [UIColor colorWithRed:192.0f/255.0f green:41.0f/255.0f blue:66.0f/255.0f alpha:1.0f];
-        deliverTable.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        deliverTable.tableView.scrollEnabled = FALSE;
-        [blackCard addSubview:deliverTable.view];
-        
-        
-        
-        //BUILD ITEMS LIST
-        deliverItemsScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(deliverTable.view.bounds.size.width*0.005, deliverTable.view.bounds.size.height*0.52, deliverTable.view.bounds.size.width*0.99, deliverTable.view.bounds.size.height*0.4)];
-        deliverItemsScroll.backgroundColor = [UIColor clearColor];
-        //[deliverTable.view addSubview:deliverItemsScroll];
-        
+       // backCard.backgroundColor = [UIColor whiteColor];
+
+      
         
 
         
@@ -452,7 +359,7 @@
 -(void)buildBoxHolder{
 
     //BOX HOLDER
-    boxHolder = [[UIView alloc] initWithFrame:CGRectMake(0,0 ,self.bounds.size.width, self.bounds.size.height)];
+    boxHolder = [[UIView alloc] initWithFrame:CGRectMake(0,0 ,self.bounds.size.width, self.bounds.size.height*1.0)];
     boxHolder.backgroundColor = [UIColor clearColor];
     boxHolder.clipsToBounds = FALSE;
     boxHolder.userInteractionEnabled = TRUE;
@@ -494,7 +401,7 @@
     CGPathAddArc(path, NULL, cornerRadius, frame.size.height - cornerRadius, cornerRadius, M_PI_2, M_PI, NO);
     //path is set as the _shapeLayer object's path
     
-    //CHECK IF DELIVERY
+    /*/CHECK IF DELIVERY
     if([type isEqualToString:@"DELIVERY"]){
         CGAffineTransform translation = CGAffineTransformMakeTranslation(0,self.bounds.size.height*0.1);
         _shapeLayer.path = CGPathCreateCopyByTransformingPath(path, &translation);
@@ -502,7 +409,9 @@
     else{
         _shapeLayer.path = path;
     }
+    */
     
+    _shapeLayer.path = path;
     
     CGPathRelease(path);
     
@@ -625,7 +534,7 @@
         fakeBoxHolder.layer.shadowOffset = CGSizeMake(0, 0);
         fakeBoxHolder.layer.shadowOpacity = 0.5f;
         fakeBoxHolder.layer.shadowRadius = 5.0;
-        [boxHolder addSubview:fakeBoxHolder];
+        //[boxHolder addSubview:fakeBoxHolder];
         
       
        
@@ -643,7 +552,6 @@
     [deckBut setBackgroundImage:[[UIImage imageNamed:@"filterBut.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0.0] forState:UIControlStateNormal];
     [deckBut addTarget:myDelegate action:@selector(showSelectionScreen) forControlEvents:UIControlEventTouchUpInside];
     deckBut.alpha = 0;
-        [deckBut addTarget:myDelegate action:@selector(showSelectionScreen) forControlEvents:UIControlEventTouchUpInside];
     [boxHolder addSubview:deckBut];
     
     //FILTER BUT
@@ -666,6 +574,10 @@
     //WINE COLOR SELECTION BUTS
 }
 
+
+-(void)openCloseUserDeck{
+    [myDelegate openCloseUser];
+}
 
 
 
@@ -726,14 +638,22 @@
     lastLocation = self.center;
     
     
+    //GET SCROLL CONTENT OFFSET
+    contentOffPrev = CGPointMake(scrollView.contentOffset.x, scrollView.contentOffset.y);
+    
+    [scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, -scrollView.contentInset.top) animated:NO];
+   
+
+    
+    
     //HIDE OTHER CARDS
     [self hideAllCards];
     
     //SHOW BLACK CARD - HIDE BOX HOLDER
     [UIView beginAnimations:NULL context:NULL];
     [UIView setAnimationDelegate:self];
-    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
-    [UIView setAnimationDuration:0.25f];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
+    [UIView setAnimationDuration:0.35f];
     [UIView setAnimationDidStopSelector:@selector(blackCardOnTop)];
     blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
     [UIView commitAnimations];
@@ -858,7 +778,7 @@
     
     //FLIP OVER CARD
     
-    [self showBackCard];
+    //[self showBackCard];
     
     
 }
@@ -878,6 +798,54 @@
 
 -(void)blackCardOnTop{
     [self bringSubviewToFront:blackCard];
+    
+    NSLog(@"BLACK CARD ANI");
+    
+    /*
+    float aniDela = 1.5f;
+    //PROMPT DOWN
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:0.15f];
+    [UIView setAnimationDelay:aniDela];
+    blackCard.center = CGPointMake(self.center.x, self.center.y + self.frame.size.height*0.1);
+    [UIView commitAnimations];
+    
+    aniDela += 0.15f;
+    
+    //CENTER off
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:0.15f];
+    [UIView setAnimationDelay:aniDela];
+    blackCard.center = CGPointMake(self.center.x, self.center.y + self.frame.size.height*0.05);
+    [UIView commitAnimations];
+    
+    aniDela += 0.15f;
+    
+    //DOWN
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:0.15f];
+    [UIView setAnimationDelay:aniDela];
+    blackCard.center = CGPointMake(self.center.x, self.center.y + self.frame.size.height*0.1);
+    [UIView commitAnimations];
+    
+    aniDela += 0.15f;
+    
+    //CENTER
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+    [UIView setAnimationDuration:0.25f];
+    [UIView setAnimationDelay:aniDela];
+    blackCard.center = self.center;
+    [UIView commitAnimations];
+    */
+    
 }
 
 -(void)loadFilterSettings{
@@ -903,12 +871,12 @@
     [moodButs removeAllObjects];
     
     //COLOR FILTER
-    float dW = self.bounds.size.width*1.0;
-    float colorW = dW/[colorFilter count];
+    float dW = self.bounds.size.width;
+    float colorW = dW/([colorFilter count]+1);
     for (int i =0; i<[colorFilter count]; i++) {
         //ADD WINE COLOR
         UIImageView *color = [[UIImageView alloc] initWithImage:[UIImage imageNamed:[NSString stringWithFormat:@"%@1.png",[[colorFilter objectAtIndex:i] uppercaseString]] ]];
-        color.frame = CGRectMake((i)*colorW, self.bounds.size.height*0.520, colorW, self.bounds.size.height*0.06);
+        color.frame = CGRectMake((i)*colorW, self.bounds.size.height*0.875, colorW, self.bounds.size.height*0.07);
         color.backgroundColor = [UIColor clearColor];
         color.contentMode = UIViewContentModeScaleAspectFit;
         color.tag = i;
@@ -918,7 +886,7 @@
         [colorButs addObject:color];
         
         //ADD WINE LABEL
-        UILabel* promptText = [[UILabel alloc] initWithFrame:CGRectMake((i)*colorW, self.bounds.size.height*0.575, colorW, self.bounds.size.height*0.04)];
+        UILabel* promptText = [[UILabel alloc] initWithFrame:CGRectMake((i)*colorW, self.bounds.size.height*0.94, colorW, self.bounds.size.height*0.04)];
         promptText.font = [UIFont fontWithName:@"SFUIText-Regular" size:(promptText.bounds.size.height*0.45)];
         promptText.textAlignment =  NSTextAlignmentCenter;
         promptText.backgroundColor = [UIColor clearColor];
@@ -942,7 +910,43 @@
     
     //MOOD FILTER
     //ANIMATE DECKS IN
-   
+    UILabel *filterPlabel = [[UILabel alloc] initWithFrame:CGRectMake(self.bounds.size.width*0.2, self.bounds.size.height*0.8  ,self.bounds.size.width*0.6, self.bounds.size.height*0.05)];
+
+    filterPlabel.backgroundColor = [UIColor clearColor];
+    filterPlabel.alpha = 0.5f;
+    filterPlabel.textAlignment =  NSTextAlignmentCenter;
+    filterPlabel.textColor = [UIColor whiteColor];
+    filterPlabel.font = [UIFont fontWithName:@"SFUIText-Regular" size:(filterPlabel.bounds.size.height*0.55)];
+    filterPlabel.userInteractionEnabled = FALSE;
+    [filterPlabel setText:@"FILTER BY"];
+    [blackCard addSubview:filterPlabel];
+    
+    //FILTER BUT
+    //ADD WINE COLOR
+    UIImageView *shuffleBut = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"deckBut.png"]];
+    shuffleBut.frame = CGRectMake([colorFilter count]*colorW, self.bounds.size.height*0.875, colorW, self.bounds.size.height*0.07);
+    shuffleBut.backgroundColor = [UIColor clearColor];
+    shuffleBut.contentMode = UIViewContentModeScaleAspectFit;
+    //color.alpha = 0.75f;
+    shuffleBut.userInteractionEnabled = TRUE;
+    [blackCard addSubview:shuffleBut];
+    
+    //ADD SHUFFEL TAP
+    UITapGestureRecognizer *tapped234 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showBackCard)];
+    tapped234.numberOfTapsRequired = 1;
+    [tapped234 setDelegate:self];
+    [shuffleBut addGestureRecognizer:tapped234];
+    
+    //MOOD PROMPT
+    UILabel* filterPrompt = [[UILabel alloc] initWithFrame:CGRectMake([colorFilter count]*colorW, self.bounds.size.height*0.94, colorW, self.bounds.size.height*0.04)];
+    filterPrompt.backgroundColor = [UIColor clearColor];
+    filterPrompt.alpha = 0.5f;
+    filterPrompt.textAlignment =  NSTextAlignmentCenter;
+    filterPrompt.textColor = [UIColor whiteColor];
+    filterPrompt.font = [UIFont fontWithName:@"SFUIText-Regular" size:(filterPrompt.bounds.size.height*0.4)];
+    filterPrompt.userInteractionEnabled = FALSE;
+    [filterPrompt setText:@"MOOD"];
+    [blackCard addSubview:filterPrompt];
     
 
     
@@ -1230,10 +1234,7 @@
 
 -(void)buildScrollView{
     // ADD SCROLL VIEW
-    scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, self.bounds.size.height*0.1, self.bounds.size.width,self.bounds.size.height*0.9)];
-    if ([type isEqualToString:@"DELIVERY"]) {
-        scrollView.frame = CGRectMake(0, self.bounds.size.height*0.5, self.bounds.size.width, self.bounds.size.height*0.5);
-    }
+    scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, self.bounds.size.height*0.0, self.bounds.size.width,self.bounds.size.height*1.0)];
     scrollView.delegate = self;
     scrollView.backgroundColor = [UIColor clearColor];
     scrollView.clipsToBounds = FALSE;
@@ -1368,8 +1369,14 @@ BOOL notScrolling = TRUE;
     return totalPrice;
 }
 
+-(void)updateUserMainStatsDeck{
+    [myDelegate updateUserMainStats];
+}
 
 
+-(void)stopLoadingDeck{
+    [myDelegate stopLoading ];
+}
 
 
 #pragma mark -
@@ -1379,13 +1386,7 @@ BOOL notScrolling = TRUE;
     NSLog(@"OPEN CLOSE DECK %@",title);
     
     if(!deckOpen){
-        
-        
-        
-        
-        
         if(![type isEqualToString:@"DELIVERY"]){
-            
             //ACTIVATE DECK
             [self activateDeck];
             
@@ -1398,13 +1399,11 @@ BOOL notScrolling = TRUE;
             //CHECK IF HAS QUANTITY
             if([self getOrderQuantity]>0){
                 [self activateDeck];
-                [self showBlackCard ];
+                //[self showBlackCard ];
             }
             else{
-                [myDelegate promptSelection];
+               // [myDelegate promptSelection];
             }
-            
-            
             
         }
     }
@@ -1413,7 +1412,6 @@ BOOL notScrolling = TRUE;
         [myDelegate showSelectionScreen];
     }
 
-    
 }
 
 
@@ -1425,10 +1423,14 @@ BOOL notScrolling = TRUE;
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     NSLog(@"touched in Deck %@",title);
+    
+   
    
 }
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
     NSLog(@"DECK TOUCHES ENDED");
+    
+    [myDelegate showSelectionScreen];
 }
 
 
@@ -1445,38 +1447,7 @@ BOOL notScrolling = TRUE;
 #pragma mark ACTIVATE
 
 -(void)createCards{
-    //NSLog(@"create data");
-
-    //NSLog(@"create data %i",[data count]);
     
-    //SORT ACCORDING TO PRICE
-    /*
-    NSSortDescriptor *sortByName = [NSSortDescriptor sortDescriptorWithKey:@"price"
-                                                                 ascending:YES];
-    NSSortDescriptor *sortByColor = [NSSortDescriptor sortDescriptorWithKey:@"color"
-                                                                 ascending:YES];
-    NSArray *sortDescriptors = [NSArray arrayWithObjects:sortByName,sortByColor,nil];
-    NSArray *sortedArray = [data sortedArrayUsingDescriptors:sortDescriptors];
-    
-    */
-    
-    /*
-    NSSortDescriptor *lastDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price"
-                                ascending:YES
-                                 selector:@selector(localizedCaseInsensitiveCompare:)];
-    
-    NSArray *descriptors = [NSArray arrayWithObjects:lastDescriptor, nil];
-    //input array containing dictionaries
-    NSArray *arr = [data sortedArrayUsingDescriptors:descriptors];
-    NSLog(@"sorted %@",arr);
-    
-    [data setArray:arr];
-    */
-    
-    //data = nil;
-   //  [data removeAllObjects];
-   // [data setArray:sortedArray];
-   // data = [[NSMutableArray alloc] initWithArray:sortedArray copyItems:TRUE];
     if([cards count]>0){
         //REMOVE CARDS NOW
         NSLog(@"HAS CARDS ALREADYYYYYY");
@@ -1501,16 +1472,11 @@ BOOL notScrolling = TRUE;
     //CREATE ALL CARDS
     //NSLog(@"create data 0");
     for (NSDictionary *dictionary in data) {
-        //NSLog(@"create data 1");
 
-        Card *myCard = [[Card alloc] initWithFrame:CGRectMake(0, -self.bounds.size.height*0.1, self.bounds.size.width, self.bounds.size.height)];
+        Card *myCard = [[Card alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
         myCard.myDelegate = self;
         [myCard setData:dictionary];
         [cards addObject:myCard];
-        
-        //NSLog(@"CARD CREATED %@",myCard.title);
-        
-        //ADD FILTERS TO DECK IF THEY EXIST
         
         
         //GET ALL FILTERS
@@ -1525,10 +1491,6 @@ BOOL notScrolling = TRUE;
             }
         }
         
-        
-        
-        
-       // NSLog(@"create data 3");
 
         
         i++;
@@ -1558,7 +1520,6 @@ BOOL notScrolling = TRUE;
     NSLog(@"DECK - ACTIVATE");
     
     currentOpenCard = nil;
-    
     scrollView.scrollEnabled = TRUE;
     
     //REMOVE PAN
@@ -1572,16 +1533,7 @@ BOOL notScrolling = TRUE;
     backCard.alpha = 0;
     [UIView commitAnimations];
     
-    /*/SET SCROLL VIEW OFFSET
-    if ([type isEqualToString:@"DELIVERY"]) {
-        scrollView.frame = CGRectMake(0, self.bounds.size.height*0.6, self.bounds.size.width, self.bounds.size.height*0.4);
-    }
-    else{
-        scrollView.frame = CGRectMake(0, self.bounds.size.height*0.1, self.bounds.size.width,self.bounds.size.height*0.9);
-        [self.superview bringSubviewToFront:self];
-    }
-    */
-    scrollView.frame = CGRectMake(0, self.bounds.size.height*0.1, self.bounds.size.width,self.bounds.size.height*0.9);
+    scrollView.frame = CGRectMake(0, self.bounds.size.height*0.0, self.bounds.size.width,self.bounds.size.height*0.9);
     [self.superview bringSubviewToFront:self];
     
     NSLog(@"DECK 1");
@@ -1591,7 +1543,7 @@ BOOL notScrolling = TRUE;
     int i = 0;
     if(!deckOpen){
         NSLog(@"DECK 11");
-        if (![type isEqualToString:@"DELIVERY"])delay = 1.0f;
+        //if (![type isEqualToString:@"DELIVERY"])delay = 1.0f;
         
 
         [self createCards];
@@ -1599,62 +1551,113 @@ BOOL notScrolling = TRUE;
         //SHOW CARDS
         [ self.myDelegate performSelector: @selector( openDeck: ) withObject: self ];
         NSLog(@"DECK 13");
+        
+        [self showBlackCard];
+        
+        
+        //SET MAP CENTER
+        [deliver updateCurrentLocation];
+       
+        
+        deckOpen = true;
 
     }
-    
-    //SET SCROLL VIEW CONTENT SIZE
-    scrollView.contentSize = CGSizeMake(scrollView.frame.size.width, PREVIEWHEIGHT * ([cards count]+1));
-    
-    //REMOVE PREVIEW CARDS
-   // [self hideFakeCards];
-    
-    NSLog(@"DECK 2");
-
-    //ANIMATE CARDS
-    int di = 0;
-    for(Card *myCard in cards ) {
-        [scrollView addSubview:myCard];
-        //[scrollView insertSubview:myCard atIndex:0];
-    
+    else{
+        
+        //ALREADY OPEN
+        int di = 1;
+        for(Card *myCard in cards ) {
+            [scrollView addSubview:myCard];
+            //[scrollView insertSubview:myCard atIndex:0];
+            
+            [UIView beginAnimations:NULL context:NULL];
+            [UIView setAnimationDelegate:self];
+            [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+            [UIView setAnimationDuration:0.35f];
+            [UIView setAnimationDelay:delay];
+            myCard.center = CGPointMake(self.bounds.size.width*0.5,  PREVIEWHEIGHT*di + myCard.bounds.size.height*0.5);
+            [UIView commitAnimations];
+            
+            di++;
+        }
+        
+        //PULL DOWN HOLDER
+        [scrollView insertSubview:blackCard atIndex:0];
+        //[self insertSubview:blackCard atIndex:0];
+        [self addSubview:boxHolder];
+        
+        //if(![type isEqualToString:@"DELIVERY"]){
+        // [self addSubview:filterBut];
+        // [self addSubview:deckBut];
+        // }
+        
         [UIView beginAnimations:NULL context:NULL];
         [UIView setAnimationDelegate:self];
         [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
         [UIView setAnimationDuration:0.35f];
         [UIView setAnimationDelay:delay];
-        myCard.center = CGPointMake(self.bounds.size.width*0.5,  PREVIEWHEIGHT*di + myCard.bounds.size.height*0.5);
-        [UIView commitAnimations];
+        deckBut.alpha = 1;
+        filterBut.alpha = 1;
+        if (fakeBoxHolder!=NULL) {
+            fakeBoxHolder.alpha=1.0f;
+        }
+        
+        boxHolder.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*1.5- STARTPOINT);
+        
+        //ALL DECKS
+        if (PREVIEWHEIGHT * ([cards count]+1) < self.bounds.size.height*0.9) {
+            //MOVE DOWN BY DIFFERENCE
+            scrollView.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]+1), scrollView.bounds.size.width, self.bounds.size.height*0.9);
+            //BLACK CARD
+            blackCard.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]+1), blackCard.bounds.size.width, blackCard.bounds.size.height);
+            blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
+            
+        }
+        else{
+            blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
+        }
+        
+        
+        ////GOES TO TOP
+        /*
+         blackCard.frame = CGRectMake(0, 0, blackCard.bounds.size.width, blackCard.bounds.size.height);
          
-        di++;
+         if (PREVIEWHEIGHT * ([cards count]+1) < self.bounds.size.height*0.9) {
+         //WILL NOT SCROLL
+         
+         //scrollView.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]), scrollView.bounds.size.width, self.bounds.size.height*0.9);
+         //BLACK CARD
+         //blackCard.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]+1), blackCard.bounds.size.width, blackCard.bounds.size.height);
+         boxHolder.center = CGPointMake(self.bounds.size.width*0.5,  PREVIEWHEIGHT*di + boxHolder.bounds.size.height*0.5);
+         
+         }
+         else{
+         
+         //WILL SCROLLLL
+         boxHolder.center = CGPointMake(self.bounds.size.width*0.5,  PREVIEWHEIGHT*di + boxHolder.bounds.size.height*0.5);
+         //boxHolder.frame = CGRectMake(0, self.bounds.size.height*0.9, boxHolder.frame.size.width, boxHolder.frame.size.height);
+         //blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
+         }
+         */
+        
+        
+        
+        [UIView commitAnimations];
+        
+        [myDelegate closeFullscreenCard];
+
+
+        
     }
+    
+    //SET SCROLL VIEW CONTENT SIZE
+    scrollView.contentSize = CGSizeMake(scrollView.frame.size.width, PREVIEWHEIGHT * ([cards count]+1));
     
     NSLog(@"DECK 3");
 
     
-    //PULL DOWN HOLDER
-    [self insertSubview:blackCard atIndex:0];
-    [self addSubview:boxHolder];
     
-    
-    
-    //if(![type isEqualToString:@"DELIVERY"]){
-       // [self addSubview:filterBut];
-       // [self addSubview:deckBut];
-   // }
-   
-    
-    [UIView beginAnimations:NULL context:NULL];
-    [UIView setAnimationDelegate:self];
-    [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
-    [UIView setAnimationDuration:0.35f];
-    [UIView setAnimationDelay:delay];
-    deckBut.alpha = 1;
-    filterBut.alpha = 1;
-    if (fakeBoxHolder!=NULL) {
-        fakeBoxHolder.alpha=1.0f;
-    }
-    boxHolder.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*1.5- STARTPOINT);
-    
-    
+    //BOTTOM
     /*
     if ([type isEqualToString:@"DELIVERY"]) {
         if (PREVIEWHEIGHT * ([cards count]+1) < self.bounds.size.height*0.5) {
@@ -1683,23 +1686,12 @@ BOOL notScrolling = TRUE;
     }
      */
     
-    if (PREVIEWHEIGHT * ([cards count]+1) < self.bounds.size.height*0.9) {
-        //MOVE DOWN BY DIFFERENCE
-        scrollView.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]), scrollView.bounds.size.width, self.bounds.size.height*0.9);
-        //BLACK CARD
-        blackCard.frame = CGRectMake(0, self.bounds.size.height*0.9 - PREVIEWHEIGHT * ([cards count]+1), blackCard.bounds.size.width, blackCard.bounds.size.height);
-    }
-    else{
-        blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
-    }
-
-    [UIView commitAnimations];
-
-     deckOpen = true;
+    
+    
     
     
     //CLOSE FULLSCREEN ALWAYS
-    [myDelegate closeFullscreenCard];
+    //
     
     NSLog(@"DECK 4");
 
@@ -1721,38 +1713,49 @@ int cardPrev = 0;
         colorF = [NSMutableString stringWithFormat:@""];
         moodF = [NSMutableString stringWithFormat:@""];
         
+        //CHECK IF SCROLL LIST IS BIGGER
+        //scrollView.backgroundColor = [UIColor redColor];
+        scrollView.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.45);
+        //[scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, 0) animated:NO];
+        [scrollView setContentOffset:CGPointMake(scrollView.contentOffset.x, -scrollView.contentInset.top) animated:NO];
+
         //REMOVE AND DELETE CARDS
-        int di = 0;
-        for(Card *card in [cards reverseObjectEnumerator]) {
+        int delay = 0;
+        for(Card *card in cards ) {
             //NSLog(@"CARD ani");
             [UIView beginAnimations:NULL context:(__bridge void *)(card)];
             [UIView setAnimationDelegate:self];
-            [UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
+            [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
             [UIView setAnimationDidStopSelector:@selector(removeCardFromView:finished:context:)];
-            [UIView setAnimationDuration:0.35f];
-            card.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
+            [UIView setAnimationDuration:0.15f];
+            [UIView setAnimationDelay:delay];
+            card.center = CGPointMake(self.frame.size.width*0.5, self.frame.size.height*0.5);
             [UIView commitAnimations];
-            di++;
+            //delay += 0.1f;
         }
         
        // [self showFakeCards];
         
         //PULL UP HOLDER
-        [self addSubview:blackCard];
+        //[self addSubview:blackCard];
         [self addSubview:boxHolder];
         
         [UIView beginAnimations:NULL context:NULL];
         [UIView setAnimationDelegate:self];
-        [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
-        [UIView setAnimationDuration:0.35f];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+        [UIView setAnimationDuration:0.15f];
+        [UIView setAnimationDelay:delay];
         deckBut.alpha = 0.0f;
         filterBut.alpha = 0.0f;
         if (fakeBoxHolder!=NULL) {
             fakeBoxHolder.alpha=0.0f;
         }
-        boxHolder.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
-        blackCard.center = CGPointMake(self.bounds.size.width*0.5, self.bounds.size.height*0.5);
+        boxHolder.center = CGPointMake(self.frame.size.width*0.5, self.frame.size.height*0.5);
+        blackCard.center = CGPointMake(self.frame.size.width*0.5, self.frame.size.height*0.4);
         [UIView commitAnimations];
+        
+        
+
         
         deckOpen = FALSE;
     }
@@ -1974,7 +1977,7 @@ int cardPrev = 0;
     NSLog(@"UPDATE DELIVERY DECK TITLE");
     
     //GO THROUGH DATA AND COUNT BOTTLES
-    [self updateScrollItems];
+    [deliver updateScrollItems];
     
     //SET TITLE BASED ON BOTTLES AND TOTAL PRICE
     if ([self getOrderQuantity]<1) {
@@ -2007,13 +2010,17 @@ int cardPrev = 0;
 #pragma mark REMOVING CARDS
 
 -(void)removeCardFromView:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context{
-    if([cards containsObject: (__bridge id)(context)]){
-        [cards removeObject:(__bridge id)(context)];
-        [(__bridge Card*)context removeFromSuperview];
-        context = nil;
-        
-         // NSLog(@"OOOIIII  CARD REMOVED");
+    if (!cards || !cards.count !=NULL) {
+        if([cards containsObject: (__bridge id)(context)]){
+            
+            [(__bridge Card*)context removeFromSuperview];
+            [cards removeObject:(__bridge id)(context)];
+            context = nil;
+            
+            // NSLog(@"OOOIIII  CARD REMOVED");
+        }
     }
+    
     
   
     
@@ -2117,12 +2124,12 @@ int cardPrev = 0;
 */
 
 // Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
+/*/ An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
    
     
-    /*/ Drawing Rect
+    // Drawing Rect
     [[UIColor blackColor] setFill];
     UIRectFill(CGRectMake(self.frame.size.width*0.025, self.frame.size.height*0.925, self.frame.size.width*0.95, self.frame.size.height*0.05));
     
@@ -2163,12 +2170,12 @@ int cardPrev = 0;
     // set the mask
     self.layer.mask = maskLayer;
      
-   */
+  
     
     
    
 }
-
+ */
 -(void)dealloc{
     NSLog(@"DEALLOC DECK");
 }
